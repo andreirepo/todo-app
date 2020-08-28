@@ -1,0 +1,32 @@
+.new-todo-form {
+	border-radius: 5px;
+	padding: 20px;
+	text-align: center;
+	border: 2px solid #ececec;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.new-todo-button,
+.new-todo-input {
+	font-size: 16px;
+	border: none;
+	outline: none;
+}
+
+.new-todo-input {
+	padding: 8px;
+	border-bottom: 2px solid #ececec;
+	width: 85%;
+}
+
+.new-todo-button {
+	color: #ececec;
+	padding: 8px 25px;
+	border-radius: 5px;
+	margin-left: 10px;
+	background-color: #5da2d5;
+}
+
+.new-todo-button:hover {
+	cursor: pointer;
+}

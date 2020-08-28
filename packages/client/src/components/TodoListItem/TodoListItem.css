@@ -1,0 +1,50 @@
+.todo-item-container {
+	background: #fff;
+	border-radius: 8px;
+	margin: 8px;
+	padding: 16px;
+	position: relative;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.todo-item-container:hover {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.buttons-container {
+	position: absolute;
+	right: 12px;
+	bottom: 12px;
+}
+
+button {
+	font-size: 16px;
+	padding: 8px;
+	border: none;
+	border-radius: 5px;
+	outline: none;
+	cursor: pointer;
+}
+
+.completed-button {
+	display: inline-block;
+	color: #ececec;
+	background-color: #5cdb95;
+}
+
+.remove-button {
+	display: inline-block;
+	color: #ececec;
+	background-color: #f13c20;
+	margin-left: 8px;
+}
+
+.completed-button:hover,
+.remove-button:hover {
+	transform: scale(1.1);
+}
+
+.todo-item-container p {
+	font-size: 14px;
+	color: #a9a9a9;
+}
