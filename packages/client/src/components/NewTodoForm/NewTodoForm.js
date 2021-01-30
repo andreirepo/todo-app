@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { addTodoRequest } from '../../common/thunks/thunks';
 import { bindActionCreators } from 'redux';
 import { getTodos } from '../../common/selectors/selectors';
-
 import './NewTodoForm.css';
 
 const NewTodoForm = (props) => {

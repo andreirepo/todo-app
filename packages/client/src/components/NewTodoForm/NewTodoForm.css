@@ -25,8 +25,5 @@
 	border-radius: 5px;
 	margin-left: 10px;
 	background-color: #5da2d5;
-}
-
-.new-todo-button:hover {
 	cursor: pointer;
 }
