@@ -9,5 +9,6 @@
 		"server": "yarn workspace server start",
 		"client": "yarn workspace client dev",
 		"start": "concurrently \"yarn server\" \"yarn client\""
-	}
+	},
+	"packageManager": "yarn@3.0.2"
 }
