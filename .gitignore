@@ -1,4 +1,5 @@
 node_modules
+packages/client/dist/*.js
 
 # Yarn
 .yarn/*
@@ -7,3 +8,4 @@ node_modules
 !.yarn/plugins
 !.yarn/sdks
 !.yarn/versions
+

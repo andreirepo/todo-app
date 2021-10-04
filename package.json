@@ -6,9 +6,10 @@
 		]
 	},
 	"scripts": {
-		"server": "yarn workspace server start",
-		"client": "yarn workspace client dev",
-		"start": "concurrently \"yarn server\" \"yarn client\""
+		"build": "yarn workspaces foreach run build",
+		"start": "yarn workspaces server start",
+		"dev": "concurrently \"yarn workspace server start\" \"yarn workspace client dev\"",
+		"heroku:logs": "heroku logs --tail -a cryptic-basin-13720"
 	},
 	"packageManager": "yarn@3.0.2"
 }
