@@ -1,13 +1,13 @@
 {
-    "private": true,
-    "workspaces": {
-        "packages": [
-            "packages/**"
-        ]
-    },
-    "scripts": {
-        "server": "yarn workspace server start",
-        "client": "yarn workspace client dev",
-        "dev": "concurrently \"yarn server\" \"yarn client\""
-    }
+	"private": true,
+	"workspaces": {
+		"packages": [
+			"packages/**"
+		]
+	},
+	"scripts": {
+		"server": "yarn workspace server start",
+		"client": "yarn workspace client dev",
+		"start": "concurrently \"yarn server\" \"yarn client\""
+	}
 }
