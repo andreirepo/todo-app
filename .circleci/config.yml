@@ -5,7 +5,5 @@ orbs:
 workflows:
   build: 
     jobs:
-      - node/test:
-          version: '16.10'
+      - cypress/run:
           pkg-manager: yarn
-      - cypress/run
