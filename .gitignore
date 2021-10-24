@@ -10,4 +10,3 @@ app/server/config/config.env
 !.yarn/plugins
 !.yarn/sdks
 !.yarn/versions
-
