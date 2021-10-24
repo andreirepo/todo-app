@@ -6,7 +6,7 @@
 		]
 	},
 	"scripts": {
-		"start": "concurrently \"yarn server:start\" \"yarn client:start\"",
+		"start": "yarn concurrently \"yarn server:start\" \"yarn client:start\"",
 		"server:start": "yarn workspace server start",
 		"client:start": "yarn workspace client start",
 		"test": "yarn workspace client cy:open",
