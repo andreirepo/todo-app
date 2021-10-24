@@ -1,16 +1,16 @@
 {
 	"private": true,
+	"name": "rp-todo-app",
 	"workspaces": {
 		"packages": [
 			"packages/**"
 		]
 	},
 	"scripts": {
-		"start": "yarn workspaces server start",
 		"build": "yarn workspaces foreach run build",
-		"dev": "yarn concurrently \"yarn server:start\" \"yarn client:start\"",
-		"server:start": "yarn workspace server start",
-		"client:start": "yarn workspace client start",
+		"start": "yarn concurrently \"yarn server:start\" \"yarn client:start\"",
+		"server:start": "yarn workspace server run start",
+		"client:start": "yarn workspace client run start",
 		"test": "yarn workspace client cy:open",
 		"deploy:logs": "heroku logs --tail -a cryptic-basin-13720"
 	},

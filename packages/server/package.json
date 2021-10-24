@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"scripts": {
 		"start": "nodemon server",
-		"client": "npm start --prefix client"
+		"build": "tsc"
 	},
 	"dependencies": {
 		"colors": "^1.4.0",
