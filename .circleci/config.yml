@@ -7,4 +7,5 @@ workflows:
     jobs:
       - cypress/run:
           yarn: true
+          start: yarn start
           command-prefix: yarn workspace client
