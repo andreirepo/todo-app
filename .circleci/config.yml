@@ -6,4 +6,4 @@ workflows:
   build: 
     jobs:
       - cypress/run:
-          pkg-manager: yarn
+          yarn: true
