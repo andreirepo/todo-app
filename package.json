@@ -1,11 +1,10 @@
 {
 	"private": true,
 	"name": "rp-todo-app",
-	"workspaces": {
-		"packages": [
-			"packages/**"
-		]
-	},
+	"workspaces": [
+		"app/client",
+		"app/server"
+	],
 	"scripts": {
 		"build": "yarn workspaces foreach run build",
 		"start": "yarn concurrently \"yarn server:start\" \"yarn client:start\"",

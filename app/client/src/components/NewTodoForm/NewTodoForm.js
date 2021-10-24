@@ -33,7 +33,7 @@ const NewTodoForm = (props) => {
 				onChange={(e) => setInputValue(e.target.value)}
 				onKeyDown={handleKeyDown}
 			/>
-			<button onClick={handleCreateTodo} className="new-todo-button">
+			<button onClick={handleCreateTodo} className="new-todo-button" data-testid="create-todo">
 				<i className="fas fa-plus"></i>
 			</button>
 		</div>

@@ -26,7 +26,7 @@ const TodoList = ({
 	useEffect(() => {
 		startLoadingTodos();
 	}, []);
-	const loadingMessage = <div className="loader">Loading...</div>;
+	const loadingMessage = <div className="loader" data-testid="spinner">Loading...</div>;
 	const content = (
 		<div className="list-wrapper">
 			<NewTodoForm />
