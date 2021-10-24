@@ -7,9 +7,13 @@
 	},
 	"scripts": {
 		"build": "yarn workspaces foreach run build",
-		"start": "yarn workspaces server start",
+		"start": "yarn workspace server start",
 		"dev": "concurrently \"yarn workspace server start\" \"yarn workspace client dev\"",
-		"heroku:logs": "heroku logs --tail -a cryptic-basin-13720"
+		"test": "yarn workspace client cy:open",
+		"deploy:logs": "heroku logs --tail -a cryptic-basin-13720"
 	},
-	"packageManager": "yarn@3.0.2"
+	"packageManager": "yarn@3.0.2",
+	"devDependencies": {
+		"concurrently": "^6.3.0"
+	}
 }
