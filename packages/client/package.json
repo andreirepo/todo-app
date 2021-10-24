@@ -4,7 +4,7 @@
 	"main": "index.js",
 	"license": "MIT",
 	"scripts": {
-		"dev": "npx webpack-dev-server --moode development",
+		"start": "npx webpack-dev-server --moode development",
 		"build": "npx webpack --mode development",
 		"test": "mocha \"src/**/*.test.js\" --require @babel/register --recursive",
 		"cy:open": "yarn cypress open",
