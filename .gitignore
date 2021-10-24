@@ -1,2 +1,12 @@
 node_modules
+packages/client/dist/*.js
 .DS_Store
+
+# Yarn
+.yarn/*
+!.yarn/cache
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
