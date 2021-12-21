@@ -13,7 +13,7 @@
 ## Running the application
 
 1. Run `yarn start` to start the client.
-2. Check it out under: `http://localhost:3000`.
+2. Check it out under: `http://localhost:7000`.
 
 ## License
 
