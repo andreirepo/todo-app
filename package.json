@@ -11,7 +11,8 @@
 		"server:start": "yarn workspace server run start",
 		"client:start": "yarn workspace client run start",
 		"test": "yarn workspace client cy:open",
-		"deploy:logs": "heroku logs --tail -a cryptic-basin-13720"
+		"deploy:logs": "heroku logs --tail -a cryptic-basin-13720",
+		"postinstall": "yarn workspace client run tsc"
 	},
 	"packageManager": "yarn@3.0.2",
 	"devDependencies": {
