@@ -5,8 +5,7 @@
 	"license": "MIT",
 	"scripts": {
 		"start": "npx webpack-dev-server --moode development",
-		"build": "npx webpack --mode development",
-		"tsc": "tsc",
+		"build": "tsc",
 		"test": "mocha \"src/**/*.test.js\" --require @babel/register --recursive",
 		"cy:open": "yarn cypress open",
 		"cy:test": "yarn cypress run --browser chrome --headless"

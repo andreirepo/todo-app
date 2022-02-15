@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "jsx": "react",
+      "strict": true,
+      "forceConsistentCasingInFileNames": true,
+      "esModuleInterop": true,
+      "target": "es5",
+      "lib": ["es5", "dom"],
+      "skipLibCheck": true,
+      "types": [
+        "node"]
+    },
+    "include": ["**/*.ts"]
+  }
+  

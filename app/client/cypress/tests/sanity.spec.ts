@@ -1,10 +1,10 @@
-describe('Todo App Smoke Tests', () => {
-    beforeEach(() => {
-        cy.visit('/')
-    })
+describe('Smoke Tests', () => {
     it('can remove a note', () => {
         const myNote = 'My Awesome Note!'
+        
         cy.intercept('http://localhost:5000/api/todos').as('getAllTodos')
+
+         cy.visit('/')
 
         // assert spinner not shown
         cy.get('[data-testid=spinner]').should('not.exist')

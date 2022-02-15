@@ -4,8 +4,7 @@
 	"main": "server.js",
 	"license": "MIT",
 	"scripts": {
-		"start": "nodemon server",
-		"build": "tsc"
+		"start": "nodemon server"
 	},
 	"dependencies": {
 		"colors": "^1.4.0",
