@@ -8,7 +8,7 @@
 		"build": "tsc",
 		"test": "mocha \"src/**/*.test.js\" --require @babel/register --recursive",
 		"cy:open": "yarn cypress open",
-		"cy:test": "yarn cypress run --browser chrome --headless"
+		"cy:test": "yarn cypress run --browser edge --headless"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.8.4",
