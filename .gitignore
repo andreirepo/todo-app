@@ -5,7 +5,7 @@ app/server/config/config.env
 app/client/cypress/videos/
 
 # Yarn
-.yarn/*
+.yarn
 !.yarn/cache
 !.yarn/releases
 !.yarn/plugins
