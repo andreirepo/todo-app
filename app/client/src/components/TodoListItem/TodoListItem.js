@@ -2,9 +2,10 @@ import React from 'react';
 import './TodoListItem.css';
 import Moment from 'react-moment';
 
-const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed }) => (
-	<div className="todo-item-container">
-		<h3>{todo.text}</h3>
+const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) => (
+	<div className={`todo-item-container ${className}`}>
+		<h3
+			className={`${className}-title`}>{todo.text} </h3>
 		<p>
 			Created at:&nbsp;
 			<Moment format="YYYY/MM/DD">{todo.date}</Moment>

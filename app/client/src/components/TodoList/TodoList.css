@@ -24,6 +24,15 @@
 	-webkit-animation: load8 1.1s infinite linear;
 	animation: load8 1.1s infinite linear;
 }
+
+.completed {
+	background-color: #D3D3D3
+}
+
+h3.completed-title {
+	text-decoration: line-through;
+}
+
 @-webkit-keyframes load8 {
 	0% {
 		-webkit-transform: rotate(0deg);
