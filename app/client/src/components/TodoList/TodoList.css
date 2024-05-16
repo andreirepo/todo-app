@@ -26,7 +26,12 @@
 }
 
 .completed {
-	background-color: #D3D3D3
+	background-color: #90EE90
+}
+
+h2 {
+	text-align: center;
+	margin: 40px 0;
 }
 
 h3.completed-title {

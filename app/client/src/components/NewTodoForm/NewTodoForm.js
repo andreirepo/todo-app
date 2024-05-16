@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { addTodoRequest } from '../../common/thunks/thunks';
-import { bindActionCreators } from 'redux';
 import { getTodos } from '../../common/selectors/selectors';
 import './NewTodoForm.css';
 
@@ -26,18 +25,18 @@ const NewTodoForm = (props) => {
 			className="new-todo-form"
 			data-testid="todo-form"
 		>
-			<h2>Welcome!</h2>
-			<p>To get started, add some items to your list:</p>
+			<h2>Welcome to the Todo App</h2>
+			<p>Start by adding a few tasks to your list:</p>
 			<input
 				className="todo-input"
-				data-testid="new-todo-input"
+				data-testid="todo-input"
 				type="text"
-				placeholder="Add your new todo here!"
+				placeholder="Enter your new task here"
 				value={inputValue}
 				onChange={(e) => setInputValue(e.target.value)}
 				onKeyDown={handleKeyDown}
 			/>
-			<button onClick={handleCreateTodo} className="new-todo-button" data-testid="create-button">
+			<button onClick={handleCreateTodo} className="new-todo-button" data-testid="create-button" disabled={!inputValue.trim()}>
 				<i className="fas fa-plus"></i>
 			</button>
 		</div>
