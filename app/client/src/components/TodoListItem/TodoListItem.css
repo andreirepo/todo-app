@@ -1,5 +1,5 @@
 .todo-item-container {
-	background: #fff;
+	background: #f9f9f9;
 	border-radius: 8px;
 	margin: 10px;
 	padding: 25px;
@@ -17,11 +17,14 @@
 	bottom: 12px;
 }
 
+.new-todo-button {
+	border-radius: 15px;
+}
+
 button {
 	font-size: 16px;
 	padding: 8px;
 	border: none;
-	border-radius: 5px;
 	outline: none;
 	cursor: pointer;
 }
@@ -30,6 +33,14 @@ button {
 	display: inline-block;
 	color: #ececec;
 	background-color: #5cdb95;
+}
+
+.completed-button,
+.remove-button {
+	width: 35px;
+    height: 35px;
+	border-radius: 50%;
+	transition: all 0.2s ease;
 }
 
 .remove-button {
@@ -41,7 +52,9 @@ button {
 
 .completed-button:hover,
 .remove-button:hover {
-	transform: scale(1.1);
+    transform: scale(1.1);
+    color: #fff;
+    background-color: #1c96f4;
 }
 
 .todo-item-container p {

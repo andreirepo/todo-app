@@ -22,12 +22,13 @@
     border-bottom: 2px solid #ececec;
     width: calc(100% - 10px);
     margin-right: 10px;
+    background-color: #F5F5F5;
 }
 
 .new-todo-button {
     margin-top: 8px;
 	color: #ececec;
-	background-color: #5da2d5;
+	background-color: #1c96f4;
 	cursor: pointer;
 }
 
