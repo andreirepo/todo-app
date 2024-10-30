@@ -2,7 +2,6 @@ node_modules
 .DS_Store
 app/client/dist/*.js
 app/server/config/config.env
-app/client/cypress/videos/
 
 # Yarn
 .yarn
