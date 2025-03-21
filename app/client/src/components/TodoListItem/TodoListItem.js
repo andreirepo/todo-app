@@ -1,6 +1,6 @@
 import React from 'react';
-import './TodoListItem.css';
 import Moment from 'react-moment';
+import './TodoListItem.css';
 
 const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) => (
 	<div className={`todo-item-container ${className}`}>

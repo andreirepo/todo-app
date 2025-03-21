@@ -1,26 +1,21 @@
 {
-	"private": true,
-	"name": "rp-todo-app",
-	"workspaces": [
-		"app/client",
-		"app/server"
-	],
-	"scripts": {
-		"build": "yarn workspaces foreach run build",
-		"start": "yarn concurrently \"yarn server:start\" \"yarn client:start\"",
-		"server:start": "yarn workspace server run start",
-		"client:start": "yarn workspace client run start",
-		"test": "yarn workspace client cy:test",
-		"deploy:logs": "heroku logs --tail -a cryptic-basin-13720",
-		"postinstall": "yarn workspace client run tsc"
-	},
-	"packageManager": "yarn@3.0.2",
-	"devDependencies": {
-		"concurrently": "^6.3.0"
-	},
-	"engines": {
-		"node": "14.17.6",
-		"npm": "6.14.15",
-		"yarn": "3.0.2"
-	}
+  "name": "todo-app",
+  "private": true,
+  "workspaces": [
+    "app/client",
+    "app/server"
+  ],
+  "scripts": {
+    "build": "yarn workspaces foreach --all run build",
+    "start": "yarn concurrently \"yarn server:start\" \"yarn client:start\"",
+    "server:start": "yarn workspace server run start",
+    "client:start": "yarn workspace client run start"
+  },
+  "packageManager": "yarn@4.7.0",
+  "devDependencies": {
+    "concurrently": "^6.3.0"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2"
+  }
 }

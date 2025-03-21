@@ -1,6 +1,7 @@
 node_modules
 .DS_Store
 app/client/dist/*.js
+app/client/dist/      
 app/server/config/config.env
 
 # Yarn
@@ -10,3 +11,4 @@ app/server/config/config.env
 !.yarn/plugins
 !.yarn/sdks
 !.yarn/versions
+

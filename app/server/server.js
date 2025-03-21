@@ -26,14 +26,26 @@ if (process.env.NODE_ENV === 'development') {
 // Define Routes
 app.use('/api/todos', todos);
 
-const PORT = process.env.PORT || 5000;
+app.get('/api', (req, res) => {
+  res.json({ status: 'Todo API running' });
+});
 
-const server = app.listen(
-	PORT,
-	console.log(
-		`Server started in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
-	)
-);
+// Add this after your other routes
+app.get('*', (req, res) => {
+  res.redirect('/');
+});
+
+const port = process.env.PORT || 5000;
+
+const server = app.listen(port, () => {
+  console.log(`Server started in ${process.env.NODE_ENV} mode on port ${port}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    const altPort = port + 1;
+    console.log(`Port ${port} in use, trying ${altPort}`);
+    server.listen(altPort);  // Fixed port increment (5000 → 5001)
+  }
+});
 
 process.on('unhandledRejection', (err, promise) => {
 	console.log(`Error: ${err.message}`.red);

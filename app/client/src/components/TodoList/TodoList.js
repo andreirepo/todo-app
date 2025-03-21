@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-// import styled from 'styled-components';
 import NewTodoForm from '../NewTodoForm/NewTodoForm';
 import TodoListItem from '../TodoListItem/TodoListItem';
 import {
@@ -14,6 +13,7 @@ import {
 	getIncompleteTodos,
 } from '../../common/selectors/selectors';
 import './TodoList.css';
+
 
 const TodoList = ({
 	completedTodos,
@@ -39,7 +39,7 @@ const TodoList = ({
 					onCompletedPressed={onCompletedPressed}
 				/>
 			))}
-			{completedTodos.length > 0 && <h2>Finished Tasks</h2>}
+			{completedTodos.length > 0 && <h2>Completed Tasks</h2>}
 			{completedTodos.sort((a, b) => b.createdAt - a.createdAt).map((todo) => (
 				<TodoListItem
 					todo={todo}
