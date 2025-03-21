@@ -3,6 +3,8 @@ node_modules
 app/client/dist/*.js
 app/client/dist/      
 app/server/config/config.env
+.pnp.cjs
+.pnp.loader.mjs
 
 # Yarn
 .yarn
