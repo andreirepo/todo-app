@@ -50,7 +50,7 @@ module.exports = {
             loader: "css-loader",
             options: {
               modules: {
-                auto: true, // This enables modules for all CSS files
+                auto: true, 
                 localIdentName: "[name]__[local]--[hash:base64:5]",
               },
             },
