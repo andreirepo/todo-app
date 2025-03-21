@@ -77,19 +77,19 @@ router.delete('/:id', async (req, res) => {
 	try {
 		const todo = await Todo.findById(req.params.id);
 
-		if (!todo === 'ObjectId') {
+		if (!todo) {
 			return res.status(404).json({ msg: 'Not Found' });
 		}
 
-		await todo.remove();
+		await todo.deleteOne();  
 
 		res.json({ msg: 'Successfully Removed', id: req.params.id });
 	} catch (err) {
 		console.log(err.message);
-		if (err.kind === 'ObjectId') {
-			return res.status(404).json({ msg: 'Not Found' });
-		}
-		res.status(500).send('Server Error');
+		res.status(500).json({  
+			error: 'Server Error',
+			details: err.message
+		});
 	}
 });
 
