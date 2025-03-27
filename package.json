@@ -6,13 +6,19 @@
     "app/server"
   ],
   "scripts": {
-    "build": "yarn workspaces foreach --all run build",
-    "start": "yarn concurrently \"yarn server:start\" \"yarn client:start\"",
+    "build": "yarn workspaces foreach -pv run build",
+    "start": "yarn concurrently -k \"yarn server:start\" \"yarn client:start\"",
+    "dev": "yarn concurrently -k \"yarn server:dev\" \"yarn client:start\"",
     "server:start": "yarn workspace server run start",
-    "client:start": "yarn workspace client run start"
+    "server:dev": "yarn workspace server run dev",
+    "client:start": "yarn workspace client run start",
+    "docker:build": "yarn workspaces foreach run docker:build",
+    "clean": "yarn workspaces foreach run clean",
+    "lint": "yarn workspaces foreach run lint"
   },
   "packageManager": "yarn@4.7.0",
   "devDependencies": {
+    "@yarnpkg/plugin-workspace-tools": "^3.0.0",
     "concurrently": "^6.3.0"
   },
   "dependencies": {
