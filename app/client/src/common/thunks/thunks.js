@@ -1,69 +1,50 @@
-import {
-	loadTodosInProgress,
-	loadTodosSuccess,
-	loadTodosFailure,
-	createTodo,
-	removeTodo,
-	markTodoAsCompleted,
-} from '../actions';
+// Replace with modern Redux Toolkit async thunks
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
-export const loadTodos = () => async (dispatch) => {
-	try {
-		dispatch(loadTodosInProgress());
-		const response = await fetch('http://localhost:5000/api/todos');
-		const todos = await response.json();
+export const fetchTodos = createAsyncThunk(
+  'todos/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch('/api/todos');
+      
+      if (!response.ok) {
+        return rejectWithValue('Failed to fetch todos');
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
-		dispatch(loadTodosSuccess(todos));
-	} catch (err) {
-		dispatch(loadTodosFailure());
-		dispatch(displayAlert(err));
-	}
-};
+export const addTodoRequest = createAsyncThunk(
+  'todos/add',
+  async (todoText) => {
+    const response = await fetch('/api/todos', {
+      method: 'POST',
+      body: JSON.stringify({ text: todoText }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return await response.json();
+  }
+);
 
-export const addTodoRequest = (text) => async (dispatch) => {
-	try {
-		const body = JSON.stringify({ text });
-		const response = await fetch('http://localhost:5000/api/todos', {
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			method: 'post',
-			body,
-		});
-		const todo = await response.json();
-		dispatch(createTodo(todo));
-	} catch (err) {
-		dispatch(displayAlert(err));
-	}
-};
+export const removeTodoRequest = createAsyncThunk(
+  'todos/remove',
+  async (todoId) => {
+    await fetch(`/api/todos/${todoId}`, { method: 'DELETE' });
+    return todoId;
+  }
+);
 
-export const removeTodoRequest = (id) => async (dispatch) => {
-	try {
-		const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
-			method: 'delete',
-		});
-		const removedTodo = await response.json();
-		dispatch(removeTodo(removedTodo));
-	} catch (err) {
-		dispatch(displayAlert(err));
-	}
-};
-
-export const markTodoAsCompletedRequest = (id) => async (dispatch) => {
-	try {
-		const response = await fetch(
-			`http://localhost:5000/api/todos/${id}/completed`,
-			{
-				method: 'post',
-			}
-		);
-		const updatedTodo = await response.json();
-		dispatch(markTodoAsCompleted(updatedTodo));
-	} catch (err) {
-		dispatch(displayAlert(err));
-	}
-};
-
-export const displayAlert = (text) => () => {
-	alert(text);
-};
+export const markTodoAsCompletedRequest = createAsyncThunk(
+  'todos/complete',
+  async (todoId) => {
+    const response = await fetch(`/api/todos/${todoId}/completed`, { 
+      method: 'POST' 
+    });
+    return await response.json();
+  }
+);

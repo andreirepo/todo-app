@@ -25,20 +25,20 @@ const NewTodoForm = (props) => {
 			className="new-todo-form"
 			data-testid="todo-form"
 		>
-			<h2>Welcome to the Todo App</h2>
-			<p>Start by adding a few tasks to your list:</p>
-			<input
-				className="todo-input"
-				data-testid="todo-input"
-				type="text"
-				placeholder="Enter your new task here"
-				value={inputValue}
-				onChange={(e) => setInputValue(e.target.value)}
-				onKeyDown={handleKeyDown}
-			/>
-			<button onClick={handleCreateTodo} className="new-todo-button" data-testid="create-button" disabled={!inputValue.trim()}>
-				<i className="fas fa-plus"></i>
-			</button>
+			<div className="new-todo">
+				<input
+					className="todo-input"
+					data-testid="todo-input"
+					type="text"
+					placeholder="What do you need to do?"
+					value={inputValue}
+					onChange={(e) => setInputValue(e.target.value)}
+					onKeyDown={handleKeyDown}
+				/>
+				<button onClick={handleCreateTodo} className="new-todo-button" data-testid="create-button" disabled={!inputValue.trim()}>
+					<i className="fas fa-plus"></i>
+				</button>
+			</div>
 		</div>
 	);
 };

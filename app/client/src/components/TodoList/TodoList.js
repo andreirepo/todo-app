@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import NewTodoForm from '../NewTodoForm/NewTodoForm';
 import TodoListItem from '../TodoListItem/TodoListItem';
 import {
-	loadTodos,
+	fetchTodos,
 	removeTodoRequest,
-	markTodoAsCompletedRequest,
-} from '../../common/thunks/thunks';
+	markTodoAsCompletedRequest
+	} from '../../common/thunks/thunks';
 import {
 	getTodosLoading,
 	getCompletedTodos,
@@ -25,13 +25,23 @@ const TodoList = ({
 }) => {
 	useEffect(() => {
 		startLoadingTodos();
-	}, []);
+	}, [startLoadingTodos]);
+
 	const loadingMessage = <div className="loader" data-testid="spinner">Loading...</div>;
+	
+	// Safe sort function that handles missing createdAt
+	const safeSort = (a, b) => {
+		if (!a.createdAt && !b.createdAt) return 0;
+		if (!a.createdAt) return 1;
+		if (!b.createdAt) return -1;
+		return new Date(b.createdAt) - new Date(a.createdAt);
+	};
+	
 	const content = (
 		<div className="list-wrapper">
 			<NewTodoForm />
 			{incompletedTodos.length > 0 && <h2>Pending Tasks</h2>}
-			{incompletedTodos.sort((a, b) => b.createdAt - a.createdAt).map((todo) => (
+			{incompletedTodos.slice().sort(safeSort).map((todo) => (
 				<TodoListItem
 					todo={todo}
 					key={todo._id}
@@ -40,7 +50,7 @@ const TodoList = ({
 				/>
 			))}
 			{completedTodos.length > 0 && <h2>Completed Tasks</h2>}
-			{completedTodos.sort((a, b) => b.createdAt - a.createdAt).map((todo) => (
+			{completedTodos.slice().sort(safeSort).map((todo) => (
 				<TodoListItem
 					todo={todo}
 					key={todo._id}
@@ -61,7 +71,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	startLoadingTodos: () => dispatch(loadTodos()),
+	startLoadingTodos: () => dispatch(fetchTodos()),
 	onRemovePressed: (id) => dispatch(removeTodoRequest(id)),
 	onCompletedPressed: (id) => dispatch(markTodoAsCompletedRequest(id)),
 });
