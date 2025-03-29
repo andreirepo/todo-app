@@ -3,11 +3,12 @@ import { check, validationResult } from 'express-validator';
 import Todo from '../models/Todo';
 
 const router = Router();
+const apiUrl = process.env.API_URL || '/app/todo/api';
 
 // @route   GET api/todos
 // @desc    Get all todos
 // @access  Public
-router.get('/', async (req: Request, res: Response): Promise<void> => {
+router.get(`${apiUrl}`, async (req: Request, res: Response): Promise<void> => {
   try {
     const todos = await Todo.find().sort({ date: -1 });
     res.json(todos);
@@ -21,7 +22,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
 // @desc    Create a todo
 // @access  Public
 router.post(
-  '/',
+  `${apiUrl}`,
   [check('text', 'Todo description is required').not().isEmpty()],
   async (req: Request, res: Response): Promise<void> => {
     const errors = validationResult(req);
@@ -44,7 +45,7 @@ router.post(
 // @route   POST api/todos/:id/completed
 // @desc    Mark todo as completed
 // @access  Public
-router.post('/:id/completed', async (req: Request, res: Response): Promise<void> => {
+router.post(`${apiUrl}/:id/completed`, async (req: Request, res: Response): Promise<void> => {
   try {
     const todo = await Todo.findById(req.params.id);
     
@@ -75,7 +76,7 @@ router.post('/:id/completed', async (req: Request, res: Response): Promise<void>
 // @route   DELETE api/todos/:id
 // @desc    Delete a todo
 // @access  Public
-router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
+router.delete(`${apiUrl}/:id`, async (req: Request, res: Response): Promise<void> => {
   try {
     const todo = await Todo.findById(req.params.id);
 
@@ -100,7 +101,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
 // @desc    Update todo
 // @access  Public
 router.put(
-  '/:id',
+  `${apiUrl}/:id`,
   [check('text', 'Todo description is required').not().isEmpty()],
   async (req: Request<{id: string}, {}, {text: string, isCompleted?: boolean}>, res: Response): Promise<void> => {
     const errors = validationResult(req);

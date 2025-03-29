@@ -1,0 +1,20 @@
+node_modules
+**/node_modules
+dist
+
+Dockerfile
+docker-compose.yml
+*.log
+
+# Git & OS stuff
+.git
+.DS_Store
+
+# Ignore Tailscale build context
+tailscale
+
+# Yarn: ignore everything except cache
+.yarn/releases
+.yarn/plugins
+.yarn/sdks
+.yarn/versions

@@ -1,7 +1,6 @@
 node_modules
 .DS_Store
 app/client/dist
-app/server/config/config.env
 app/server/dist
 .pnp.cjs
 .pnp.loader.mjs

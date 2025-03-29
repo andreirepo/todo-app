@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: './config/config.env' });
+dotenv.config({ path: '../../.env' });
 
 export function connectDB(): void {
   const uri = process.env.MONGO_URI as string;

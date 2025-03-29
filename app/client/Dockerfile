@@ -12,8 +12,12 @@ RUN yarn install --frozen-lockfile
 # Copy source files
 COPY . .
 
+# Set variables
+ARG API_URL
+ENV API_URL=$API_URL
+
 # Build step
-RUN yarn build
+RUN API_URL=$API_URL yarn build
 
 # Stage 2: Production runtime
 FROM nginx:1.25-alpine

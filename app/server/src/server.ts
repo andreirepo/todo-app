@@ -1,19 +1,19 @@
+// Load environment variables
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import morgan from 'morgan';
 import colors from 'colors';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db';
 
-// Load environment variables
-dotenv.config({ path: './config/config.env' });
-
 // Database connection
 connectDB();
 
 // Route imports
-import todos from '../routes/todos';
+import todos from './routes/todos';
 
 // Create Express application
 const app: Application = express();
@@ -28,17 +28,18 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// Log requests for debugging (optional but helpful)
+app.use((req, res, next) => {
+  console.log(`➡️  ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // API Routes
-app.use('/api/todos', todos);
+app.use(todos);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'Todo API running' });
-});
-
-// API root endpoint
-app.get('/api', (req: Request, res: Response) => {
-  res.json({ status: 'Todo API running' });
+  res.json({ status: "OK" });
 });
 
 // Server configuration

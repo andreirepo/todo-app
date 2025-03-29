@@ -4,12 +4,14 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { loadTodos } from './thunks';
 
+const API_URL = process.env.API_URL;
+
 describe('The loadTodos thunk', () => {
 	it('Dispatches the correct actions in the success scenario', async () => {
 		const fakeDispatch = sinon.spy();
 		const fakeTodos = [{ text: '1' }, { text: '2' }];
 
-		fetchMock.get('http://localhost:5000/api/todos', fakeTodos);
+		fetchMock.get(`${API_URL}/api/todos`, fakeTodos);
 
 		const expectedFirstAction = { type: 'LOAD_TODOS_IN_PROGRESS' };
 		const expectedSecondAction = {

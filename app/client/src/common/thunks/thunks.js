@@ -1,11 +1,13 @@
 // Replace with modern Redux Toolkit async thunks
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_URL = `${process.env.API_URL || '/app/todo/api'}`;
+
 export const fetchTodos = createAsyncThunk(
   'todos/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/todos');
+      const response = await fetch(API_URL);
       
       if (!response.ok) {
         return rejectWithValue('Failed to fetch todos');
@@ -22,7 +24,7 @@ export const fetchTodos = createAsyncThunk(
 export const addTodoRequest = createAsyncThunk(
   'todos/add',
   async (todoText) => {
-    const response = await fetch('/api/todos', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify({ text: todoText }),
       headers: { 'Content-Type': 'application/json' }
@@ -34,7 +36,7 @@ export const addTodoRequest = createAsyncThunk(
 export const removeTodoRequest = createAsyncThunk(
   'todos/remove',
   async (todoId) => {
-    await fetch(`/api/todos/${todoId}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/${todoId}`, { method: 'DELETE' });
     return todoId;
   }
 );
@@ -42,7 +44,7 @@ export const removeTodoRequest = createAsyncThunk(
 export const markTodoAsCompletedRequest = createAsyncThunk(
   'todos/complete',
   async (todoId) => {
-    const response = await fetch(`/api/todos/${todoId}/completed`, { 
+    const response = await fetch(`${API_URL}/${todoId}/completed`, { 
       method: 'POST' 
     });
     return await response.json();

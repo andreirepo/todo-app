@@ -1,29 +1,22 @@
-const path = require('path');  // Add this missing import
+const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
-  entry: './public/index.js', 
+  mode: process.env.NODE_ENV || 'production',
+  entry: './public/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/' // Add this line
+    publicPath: process.env.BASE_URL || '/',
+    clean: true
   },
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
-    port: 3000,  // Revert to original port with cleanup
-    hot: true,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
         secure: false,
-        bypass: (req) => {
-          if (req.headers.accept.indexOf('html') !== -1) {
-            return '/index.html';
-          }
-        }
+        changeOrigin: true,
       }
     }
   },
@@ -50,19 +43,26 @@ module.exports = {
             loader: "css-loader",
             options: {
               modules: {
-                auto: true, 
+                auto: true,
                 localIdentName: "[name]__[local]--[hash:base64:5]",
               },
             },
           },
         ],
       },
+      {
+        test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf)$/i,
+        type: 'asset/resource'
+      }
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html',
       filename: 'index.html'
+    }),
+    new webpack.DefinePlugin({
+      'process.env.API_URL': JSON.stringify(process.env.API_URL),
     })
   ],
 };
