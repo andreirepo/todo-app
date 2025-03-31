@@ -30,6 +30,25 @@ A modern, full-stack To-do application built with React, Redux, Node.js, and Mon
 - `yarn` (Package Manager)
 - Docker and Docker Compose (for containerized deployment)
 
+## ⚠️  Yarn Version Requirement
+
+This project requires **Yarn v4 (Berry)**, which is managed using **Corepack** (included with Node.js 16+). The project uses Yarn features like `.yarnrc.yml`, plugins, and workspaces that are not compatible with Yarn v1.
+
+### If you are not already using Yarn 4, follow these steps:
+
+```bash
+# Enable Corepack (included with Node.js 16+)
+corepack enable
+
+# Prepare and activate Yarn 4.x
+corepack prepare yarn@4.7.0 --activate
+
+# Initialize Yarn Berry in the project (generates .yarn/ and .yarnrc.yml)
+yarn set version berry
+
+# Install dependencies
+yarn install
+
 ## Installation Steps
 
 1. Clone the repository to your local machine.
