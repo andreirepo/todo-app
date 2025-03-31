@@ -10,11 +10,11 @@ docker-compose.yml
 .git
 .DS_Store
 
-# Ignore Tailscale build context
-tailscale
-
-# Yarn: ignore everything except cache
-.yarn/releases
-.yarn/plugins
-.yarn/sdks
-.yarn/versions
+# Yarn: allow necessary workspace files
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

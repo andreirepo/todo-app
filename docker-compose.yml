@@ -96,8 +96,8 @@ services:
 
   todo-fe:
     build: 
-      context: ./app/client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: app/client/Dockerfile
       args:
         API_URL: /api/todo
         BASE_URL: /
