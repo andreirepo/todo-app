@@ -6,7 +6,6 @@ services:
     container_name: traefik
     ports:
       - "80:80"
-      - "443:443"
     deploy:
       resources:
         limits:
@@ -41,6 +40,7 @@ services:
   todo-db:
     image: mongo:4.4
     container_name: todo-db
+    restart : unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
