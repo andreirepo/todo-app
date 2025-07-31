@@ -64,9 +64,8 @@ yarn set version berry
 
 ### Using Docker
 
-1. Make sure Docker and Docker Compose are installed
-2. Run `docker-compose up -d` to start the containers (or run the `./deploy` script)
-3. Access the application at `http://localhost:7000`
+1. Run `docker-compose up -d` to start the containers (or run the `./deploy` script)
+2. Access the application at `http://localhost:7000`
 
 ## Project Structure
 ```
