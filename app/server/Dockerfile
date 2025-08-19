@@ -4,7 +4,7 @@
     WORKDIR /app
     
     # Enable Corepack and activate Yarn 4
-    RUN corepack enable && corepack prepare yarn@4.7.0 --activate
+    RUN corepack enable && corepack prepare yarn@4.8.1 --activate
     
     # Copy monorepo root files
     COPY package.json yarn.lock .yarnrc.yml ./
@@ -27,7 +27,7 @@
 
     RUN apk add --no-cache curl
     
-    RUN corepack enable && corepack prepare yarn@4.7.0 --activate
+    RUN corepack enable && corepack prepare yarn@4.8.1 --activate
     
     # Copy only what's needed for production
     COPY package.json yarn.lock .yarnrc.yml ./
