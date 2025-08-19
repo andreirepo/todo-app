@@ -12,7 +12,7 @@ const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) 
 		setIsDeleting(true);
 		try {
 			await onRemovePressed(todo._id);
-			toast.error('Todo deleted successfully!');
+			toast.success('Todo deleted successfully!');
 		} catch (error) {
 			toast.error('Failed to delete todo');
 		} finally {

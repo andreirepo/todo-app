@@ -61,7 +61,6 @@ export const loginUser = createAsyncThunk(
         return rejectWithValue(errorMessage);
       }
 
-      toast.success('Login successful!');
       return data;
     } catch (error) {
       const errorMessage = 'Network error occurred';

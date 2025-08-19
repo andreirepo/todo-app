@@ -12,6 +12,8 @@ const TodoWithUserSchema = new mongoose.Schema({
   isCompleted: { type: Boolean, default: false },
   date: { type: Date, default: Date.now },
   userId: { type: String, required: true }
+}, {
+  collection: 'todos'
 });
 
 export default mongoose.model<ITodoWithUser>('TodoWithUser', TodoWithUserSchema);

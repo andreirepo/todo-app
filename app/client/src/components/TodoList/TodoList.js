@@ -40,6 +40,12 @@ const TodoList = ({
 	const content = (
 		<div className="list-wrapper">
 			<NewTodoForm />
+			{incompletedTodos.length === 0 && completedTodos.length === 0 && (
+				<div className="no-todos">
+					<p className="no-todos-text">No todos yet</p>
+					<p className="no-todos-subtitle">Create your first todo above</p>
+				</div>
+			)}
 			{incompletedTodos.length > 0 && <h2>Pending Tasks</h2>}
 			{incompletedTodos.slice().sort(safeSort).map((todo) => (
 				<TodoListItem

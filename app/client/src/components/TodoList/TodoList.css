@@ -128,6 +128,32 @@
   color: var(--text-primary);
 }
 
+/* No Todos Message */
+.no-todos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  margin: var(--spacing-xl) 0;
+  color: var(--text-muted);
+}
+
+.no-todos-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.no-todos-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+  opacity: 0.8;
+}
+
 /* Legacy classes for compatibility */
 .list-wrapper {
   display: flex;

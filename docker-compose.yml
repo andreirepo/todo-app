@@ -78,7 +78,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.todo-api.rule=PathPrefix(`/api/todo`)"
+      - "traefik.http.routers.todo-api.rule=PathPrefix(`/api`)"
       - "traefik.http.routers.todo-api.entrypoints=web"
       - "traefik.http.routers.todo-api.service=todo-api"
       - "traefik.http.services.todo-api.loadbalancer.server.port=5000"

@@ -9,6 +9,11 @@ const App = () => (
     <div className="container">
       <AuthWrapper />
     </div>
+    <footer className="app-footer">
+      <p className="footer-text">
+        Built with ❤️ by <a href="https://github.com/andreirepo" target="_blank" rel="noopener noreferrer" className="footer-link">Andrei</a>
+      </p>
+    </footer>
     <ToastContainer
       position="top-right" 
       autoClose={3000}

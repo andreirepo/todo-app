@@ -12,6 +12,8 @@ const RegisterForm = ({ onRegister, onSwitchToLogin, loading, error }) => {
   });
 
   const [validationError, setValidationError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { name, email, password, confirmPassword } = formData;
 
@@ -78,32 +80,52 @@ const RegisterForm = ({ onRegister, onSwitchToLogin, loading, error }) => {
         
         <div className="auth-field">
           <label htmlFor="password" className="auth-label">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className="auth-input"
-            value={password}
-            onChange={handleChange}
-            required
-            minLength="6"
-            placeholder="Minimum 6 characters"
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              className="auth-input password-input"
+              value={password}
+              onChange={handleChange}
+              required
+              minLength="6"
+              placeholder="Minimum 6 characters"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
 
         <div className="auth-field">
           <label htmlFor="confirmPassword" className="auth-label">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            className="auth-input"
-            value={confirmPassword}
-            onChange={handleChange}
-            required
-            minLength="6"
-            placeholder="Confirm your password"
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              name="confirmPassword"
+              className="auth-input password-input"
+              value={confirmPassword}
+              onChange={handleChange}
+              required
+              minLength="6"
+              placeholder="Confirm your password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+            >
+              {showConfirmPassword ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
         
         {(error || validationError) && (

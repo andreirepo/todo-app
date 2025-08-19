@@ -22,29 +22,48 @@ docker-compose build
 echo "📦 Bringing up services..."
 docker-compose up -d
 
-# Wait a few seconds for containers to spin up
-sleep 5
+# Wait for containers to be ready
+echo "⏳ Waiting for services to start..."
+sleep 10
+
+# Check if containers are running
+echo "📋 Checking container status..."
+if ! docker-compose ps | grep -q "Up"; then
+  echo "❌ Some containers failed to start!"
+  docker-compose logs --tail=10
+  exit 1
+fi
 
 # Health check for frontend
 echo "📋 Checking frontend health..."
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:80 | grep 200 > /dev/null \
-  && echo "✅ Frontend is up!" || echo "❌ Frontend not responding"
+for i in {1..5}; do
+  if curl -s -o /dev/null -w "%{http_code}\n" http://localhost:80 | grep -q 200; then
+    echo "✅ Frontend is up!"
+    break
+  elif [ $i -eq 5 ]; then
+    echo "❌ Frontend not responding after 5 attempts"
+  else
+    echo "⏳ Frontend not ready, retrying... ($i/5)"
+    sleep 3
+  fi
+done
 
-# Health check for backend
+# Health check for backend (direct port)
 echo "📋 Checking backend health..."
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:80/health | grep 200 > /dev/null \
-  && echo "✅ Backend is healthy!" || echo "❌ Backend health check failed"
+for i in {1..5}; do
+  if curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5000/health | grep -q 200; then
+    echo "✅ Backend is healthy!"
+    break
+  elif [ $i -eq 5 ]; then
+    echo "❌ Backend health check failed after 5 attempts"
+  else
+    echo "⏳ Backend not ready, retrying... ($i/5)"
+    sleep 3
+  fi
+done
 
-# Optional: Enable Tailscale Funnel
-read -p "🌐 Enable Tailscale Funnel (public access via HTTPS)? (y/N): " enable_funnel
-if [[ "$enable_funnel" == "y" || "$enable_funnel" == "Y" ]]; then
-  echo "🔗 Enabling Tailscale Funnel..."
-  sudo tailscale serve reset
-  sudo tailscale serve --bg http://localhost:80
-  echo "✅ Tailscale public URL:"
-  tailscale status | grep "$(hostname)"
-else
-  echo "🛑 Skipping Funnel setup."
-fi
-
+echo ""
 echo "🎉 Deployment complete!"
+echo "📱 Frontend: http://localhost:80"
+echo "🔧 Backend API: http://localhost:80/api"
+echo "🏥 Backend Health: http://localhost:5000/health"

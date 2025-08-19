@@ -88,6 +88,7 @@ body {
 .app {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--spacing-md);
@@ -101,6 +102,34 @@ body {
   box-shadow: var(--shadow-xl);
   overflow: hidden;
   backdrop-filter: blur(10px);
+}
+
+/* Footer Styles */
+.app-footer {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+}
+
+.footer-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-weight: 400;
+}
+
+.footer-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
+  padding: 0.125rem 0.25rem;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
 }
 
 /* Loading States */
