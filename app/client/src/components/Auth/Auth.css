@@ -257,11 +257,21 @@
     padding: var(--spacing-lg);
   }
   
+  .todo-app {
+    min-height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  
   .todo-header {
-    padding: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: 0;
+    border-radius: 0;
     flex-direction: column;
     gap: var(--spacing-sm);
     text-align: center;
+    position: relative;
   }
   
   .logout-button {
@@ -271,10 +281,6 @@
   
   .todo-content {
     padding: var(--spacing-md);
-  }
-  
-  .todo-app {
-    min-height: 500px;
   }
 }
 

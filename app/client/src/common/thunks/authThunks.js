@@ -102,7 +102,6 @@ export const loadUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   'auth/logout',
   async () => {
-    toast.success('Logged out successfully');
     return {};
   }
 );

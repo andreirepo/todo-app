@@ -30,6 +30,13 @@ const AuthWrapper = ({
     onClearErrors();
   }, [showRegister, onClearErrors]);
 
+  // Reset to login form when user logs out
+  useEffect(() => {
+    if (!isAuthenticated && isAuthenticated !== null) {
+      setShowRegister(false);
+    }
+  }, [isAuthenticated]);
+
   // Show loading spinner while checking authentication
   if (loading && isAuthenticated === null) {
     return (
