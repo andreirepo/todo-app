@@ -30,7 +30,7 @@ const NewTodoForm = (props) => {
 					className="todo-input"
 					data-testid="todo-input"
 					type="text"
-					placeholder="What do you need to do?"
+					placeholder="Add a new task..."
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
 					onKeyDown={handleKeyDown}

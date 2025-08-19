@@ -1,16 +1,14 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { check, validationResult } from 'express-validator';
-import Todo from '../models/Todo';
+import Todo from '../models/TodoWithUser';
+import { auth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
-const apiUrl = process.env.API_URL || '/app/todo/api';
 
-// @route   GET api/todos
-// @desc    Get all todos
-// @access  Public
-router.get(`${apiUrl}`, async (req: Request, res: Response): Promise<void> => {
+// GET /api/todo - Get all todos for the authenticated user
+router.get('/api/todo', auth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const todos = await Todo.find().sort({ date: -1 });
+    const todos = await Todo.find({ userId: req.user?.id }).sort({ date: -1 });
     res.json(todos);
   } catch (err: any) {
     console.log(err.message);
@@ -18,13 +16,11 @@ router.get(`${apiUrl}`, async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// @route   POST api/todos
-// @desc    Create a todo
-// @access  Public
+// POST /api/todo - Create a todo for the authenticated user
 router.post(
-  `${apiUrl}`,
-  [check('text', 'Todo description is required').not().isEmpty()],
-  async (req: Request, res: Response): Promise<void> => {
+  '/api/todo',
+  [auth, check('text', 'Todo description is required').not().isEmpty()],
+  async (req: AuthRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -32,7 +28,10 @@ router.post(
     }
 
     try {
-      const newTodo = new Todo({ text: req.body.text });
+      const newTodo = new Todo({ 
+        text: req.body.text,
+        userId: req.user?.id
+      });
       const todo = await newTodo.save();
       res.json(todo);
     } catch (err: any) {
@@ -42,12 +41,10 @@ router.post(
   }
 );
 
-// @route   POST api/todos/:id/completed
-// @desc    Mark todo as completed
-// @access  Public
-router.post(`${apiUrl}/:id/completed`, async (req: Request, res: Response): Promise<void> => {
+// POST /api/todo/:id/completed - Mark todo as completed
+router.post('/api/todo/:id/completed', auth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const todo = await Todo.findById(req.params.id);
+    const todo = await Todo.findOne({ _id: req.params.id, userId: req.user?.id });
     
     if (!todo) {
       res.status(404).json({ msg: 'Todo not found' });
@@ -73,12 +70,10 @@ router.post(`${apiUrl}/:id/completed`, async (req: Request, res: Response): Prom
   }
 });
 
-// @route   DELETE api/todos/:id
-// @desc    Delete a todo
-// @access  Public
-router.delete(`${apiUrl}/:id`, async (req: Request, res: Response): Promise<void> => {
+// DELETE /api/todo/:id - Delete a todo
+router.delete('/api/todo/:id', auth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const todo = await Todo.findById(req.params.id);
+    const todo = await Todo.findOne({ _id: req.params.id, userId: req.user?.id });
 
     if (!todo) {
       res.status(404).json({ msg: 'Not Found' });
@@ -96,44 +91,5 @@ router.delete(`${apiUrl}/:id`, async (req: Request, res: Response): Promise<void
     });
   }
 });
-
-// @route   PUT api/todos/:id
-// @desc    Update todo
-// @access  Public
-router.put(
-  `${apiUrl}/:id`,
-  [check('text', 'Todo description is required').not().isEmpty()],
-  async (req: Request<{id: string}, {}, {text: string, isCompleted?: boolean}>, res: Response): Promise<void> => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-      return;
-    }
-
-    const { text, isCompleted } = req.body;
-    const todoFields: { text?: string; isCompleted?: boolean } = {};
-
-    if (text) todoFields.text = text;
-    if (typeof isCompleted === 'boolean') todoFields.isCompleted = isCompleted;
-
-    try {
-      const todo = await Todo.findByIdAndUpdate(
-        req.params.id,
-        { $set: todoFields },
-        { new: true }
-      );
-
-      if (!todo) {
-        res.status(404).json({ msg: 'Not Found' });
-        return;
-      }
-      res.json(todo);
-      
-    } catch (err: any) {
-      console.log(err.message);
-      res.status(500).send('Server Error');
-    }
-  }
-);
 
 export default router;

@@ -1,6 +1,6 @@
 // Load environment variables
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
@@ -12,7 +12,8 @@ import { connectDB } from './config/db';
 // Database connection
 connectDB();
 
-// Route imports
+// Route imports  
+import auth from './routes/auth';
 import todos from './routes/todos';
 
 // Create Express application
@@ -28,13 +29,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Log requests for debugging (optional but helpful)
-app.use((req, res, next) => {
-  console.log(`➡️  ${req.method} ${req.originalUrl}`);
-  next();
-});
 
-// API Routes
+// API Routes  
+app.use('/api', auth);
 app.use(todos);
 
 // Health check endpoint

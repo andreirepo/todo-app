@@ -18,6 +18,11 @@ module.exports = {
         secure: false,
         changeOrigin: true,
       }
+    },
+    client: {
+      overlay: {
+        warnings: false,
+      }
     }
   },
   resolve: {

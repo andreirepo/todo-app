@@ -1,17 +1,17 @@
 import mongoose from 'mongoose';
 
-interface ITodo extends mongoose.Document {
+interface ITodoWithUser extends mongoose.Document {
   text: string;
   isCompleted: boolean;
   date: Date;
   userId: string;
 }
 
-const TodoSchema = new mongoose.Schema({
+const TodoWithUserSchema = new mongoose.Schema({
   text: { type: String, required: true },
   isCompleted: { type: Boolean, default: false },
   date: { type: Date, default: Date.now },
   userId: { type: String, required: true }
 });
 
-export default mongoose.models.Todo || mongoose.model<ITodo>('Todo', TodoSchema);
+export default mongoose.model<ITodoWithUser>('TodoWithUser', TodoWithUserSchema);

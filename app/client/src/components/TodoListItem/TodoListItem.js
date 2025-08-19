@@ -12,7 +12,7 @@ const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) 
 		setIsDeleting(true);
 		try {
 			await onRemovePressed(todo._id);
-			toast.success('Todo deleted successfully!');
+			toast.error('Todo deleted successfully!');
 		} catch (error) {
 			toast.error('Failed to delete todo');
 		} finally {
@@ -34,10 +34,10 @@ const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) 
 
     return (
         <div className={`todo-item-container ${className}`}>
-            <h3
-                className={`${className}-title todo-text`}>{todo.text} </h3>
-            <p>{'Created at: '}<Moment format="YYYY/MM/DD">{todo.date}</Moment>
-            </p>
+            <div className="todo-content-wrapper">
+                <h3 className={`${className}-title todo-text`}>{todo.text}</h3>
+                <p className="todo-date">{'Created at: '}<Moment format="YYYY/MM/DD">{todo.date}</Moment></p>
+            </div>
             <div className="buttons-container">
                 {todo.isCompleted ? null : (
                     <button
