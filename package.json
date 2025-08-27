@@ -7,7 +7,7 @@
   ],
   "packageManager": "yarn@4.8.1",
   "scripts": {
-    "build": "yarn workspaces foreach -pv run build",
+    "build": "yarn workspaces foreach --all --parallel --verbose run build",
     "start": "yarn concurrently -k \"yarn server:start\" \"yarn client:start\"",
     "dev": "yarn concurrently -k \"yarn server:dev\" \"yarn client:start\"",
     "server:start": "yarn workspace server run start",

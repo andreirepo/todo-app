@@ -2,7 +2,10 @@
 
 set -e
 
-echo "🚀 Starting deployment..."
+echo "🚀 Starting Docker deployment..."
+echo "ℹ️  Note: For serverless deployment, use: ./deploy-enhanced.sh serverless"
+echo "ℹ️  For help: ./deploy-enhanced.sh help"
+echo ""
 
 # Load env vars from .env manually if needed
 if [ -f .env ]; then

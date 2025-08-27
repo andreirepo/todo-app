@@ -2,7 +2,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
-const API_URL = '/api/todo';
+const API_BASE_URL = process.env.API_URL || '/api';
+const API_URL = `${API_BASE_URL}/todo`;
 
 // Helper function to get auth headers
 const getAuthHeaders = (token) => ({

@@ -1,0 +1,14 @@
+{
+  "name": "todo-lambda-functions",
+  "version": "1.0.0",
+  "description": "Lambda functions for Todo App",
+  "main": "index.js",
+  "dependencies": {
+    "mongodb": "^4.17.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

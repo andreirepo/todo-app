@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Todo App Serverless Backend
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Deployment stage (dev, prod)
+  MongoDBURI:
+    Type: String
+    Description: MongoDB Atlas connection string
+    NoEcho: true
+  JWTSecret:
+    Type: String
+    Description: JWT secret key
+    NoEcho: true
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 30
+    MemorySize: 256
+    Environment:
+      Variables:
+        MONGODB_URI: !Ref MongoDBURI
+        JWT_SECRET: !Ref JWTSecret
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowOrigin: "'*'"
+
+Resources:
+  # API Gateway
+  TodoApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+
+  # Auth Lambda Function
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "todo-auth-${Stage}"
+      CodeUri: ./
+      Handler: auth-minimal.handler
+      Events:
+        RegisterUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /auth/register
+            Method: POST
+        LoginUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /auth/login
+            Method: POST
+        GetCurrentUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /auth/me
+            Method: GET
+        AuthOptionsRegister:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /auth/register
+            Method: OPTIONS
+        AuthOptionsLogin:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /auth/login
+            Method: OPTIONS
+        AuthOptionsMe:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /auth/me
+            Method: OPTIONS
+
+  # Todos Lambda Function
+  TodosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "todo-todos-${Stage}"
+      CodeUri: ./
+      Handler: todos-minimal.handler
+      Events:
+        GetTodos:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /todo
+            Method: GET
+        CreateTodo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /todo
+            Method: POST
+        CompleteTodo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /todo/{id}/completed
+            Method: POST
+        DeleteTodo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /todo/{id}
+            Method: DELETE
+        TodoOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /todo
+            Method: OPTIONS
+        TodoOptionsId:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TodoApi
+            Path: /todo/{id}
+            Method: OPTIONS
+
+Outputs:
+  TodoApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${TodoApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+    Export:
+      Name: !Sub "${AWS::StackName}-ApiUrl"
+  
+  AuthFunctionArn:
+    Description: "Auth Lambda Function ARN"
+    Value: !GetAtt AuthFunction.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-AuthFunctionArn"
+
+  TodosFunctionArn:
+    Description: "Todos Lambda Function ARN"  
+    Value: !GetAtt TodosFunction.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-TodosFunctionArn"

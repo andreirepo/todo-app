@@ -7,6 +7,7 @@ RUN corepack enable && corepack prepare yarn@4.8.1 --activate
 
 # Copy monorepo files
 COPY package.json yarn.lock .yarn .yarnrc.yml ./
+COPY .env* ./
 
 # Copy the client workspace only
 COPY app/client ./app/client
@@ -18,7 +19,9 @@ RUN yarn install
 
 # Set variables
 ARG API_URL
+ARG NODE_ENV=production
 ENV API_URL=$API_URL
+ENV NODE_ENV=$NODE_ENV
 ENV PATH="./node_modules/.bin:$PATH"
 
 # Build step

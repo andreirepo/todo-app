@@ -2,6 +2,17 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+// Load environment variables based on NODE_ENV
+const envMode = process.env.NODE_ENV || 'production';
+
+// Try loading environment-specific file first
+require('dotenv').config({ path: path.resolve(__dirname, `../../.env.${envMode}`) });
+// Fallback to default .env
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
+// For Docker builds, if API_URL is passed directly as env var, respect it
+// This maintains backward compatibility with the existing Docker setup
+
 module.exports = {
   mode: process.env.NODE_ENV || 'production',
   entry: './public/index.js',
