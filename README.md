@@ -94,6 +94,10 @@ Perfect for testing frameworks:
 - **UI:** Responsive design and form validation
 - **Performance:** Database operations and concurrent users
 
+## Demo
+
+🚀 Live demo: [AWS-hosted (Lambda, may be slow due to cold starts)](https://todo.andreiqa.click/) | [Self-hosted via Tailscale Funnel](https://homelab.taile54727.ts.net:8443/)
+
 ---
 
 **Built with ❤️ by [Andrei](https://github.com/andreirepo)**
