@@ -1,46 +1,47 @@
-    # ---------- Builder ----------
-    FROM node:18-alpine AS builder
+# ---------- Builder ----------
+FROM node:18-alpine AS builder
 
-    WORKDIR /app
-    
-    # Enable Corepack and activate Yarn 4
-    RUN corepack enable && corepack prepare yarn@4.8.1 --activate
-    
-    # Copy monorepo root files
-    COPY package.json yarn.lock .yarnrc.yml ./
-    COPY .yarn/ .yarn/
-    COPY app app
-    
-    # Install dependencies for all workspaces
-    RUN yarn install --inline-builds
-    
-    # Copy server workspace code
-    COPY app/server app/server
-    
-    # Build only the server workspace
-    RUN yarn workspace server run build
-    
-    # ---------- Runtime ----------
-    FROM node:18-alpine AS runtime
-    
-    WORKDIR /app
+WORKDIR /app
 
-    RUN apk add --no-cache curl
-    
-    RUN corepack enable && corepack prepare yarn@4.8.1 --activate
-    
-    # Copy only what's needed for production
-    COPY package.json yarn.lock .yarnrc.yml ./
-    COPY .yarn/ .yarn/
-    COPY app/server/package.json app/server/package.json
-    
-    # Install just the server workspace in prod mode
-    RUN yarn workspaces focus server --production
-    
-    # Copy build output
-    COPY --from=builder /app/app/server/dist app/server/dist
-    
-    WORKDIR /app/app/server
-    
-    CMD ["node", "dist/server.js"]
-    
+# Enable Corepack and install Yarn 4
+RUN corepack enable && corepack prepare yarn@4.8.1 --activate
+
+# Copy monorepo root files (no .yarn/)
+COPY package.json yarn.lock .yarnrc.yml ./
+
+# Install dependencies (Yarn will auto-download its binary)
+RUN yarn install --inline-builds
+
+# Copy server source code
+COPY app/server app/server
+
+# Build server
+RUN yarn workspace server run build
+
+
+# ---------- Runtime ----------
+FROM node:18-alpine AS runtime
+
+WORKDIR /app
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+# Enable Corepack again in runtime (for consistency)
+RUN corepack enable && corepack prepare yarn@4.8.1 --activate
+
+# Copy root files
+COPY package.json yarn.lock .yarnrc.yml ./
+
+# Copy server package.json
+COPY app/server/package.json app/server/package.json
+
+# Install only production dependencies for the server workspace
+RUN yarn workspaces focus server --production
+
+# Copy built server code
+COPY --from=builder /app/app/server/dist app/server/dist
+
+WORKDIR /app/app/server
+
+CMD ["node", "dist/server.js"]
