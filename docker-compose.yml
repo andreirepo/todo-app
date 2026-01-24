@@ -97,8 +97,6 @@ services:
       NODE_ENV: development
       API_URL: /api
       BASE_URL: /
-    volumes:
-      - ./app/client/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       todo-be:
         condition: service_healthy
@@ -110,7 +108,7 @@ services:
       - "traefik.http.routers.todo-frontend.rule=PathPrefix(`/`)"
       - "traefik.http.routers.todo-frontend.entrypoints=web"
       - "traefik.http.routers.todo-frontend.service=todo-frontend"
-      - "traefik.http.services.todo-frontend.loadbalancer.server.port=3000"
+      - "traefik.http.services.todo-frontend.loadbalancer.server.port=80"
 
 networks:
   traefik-net:
