@@ -1,35 +1,34 @@
 # Stage 1: Build application
 FROM node:18-alpine AS builder
+
 WORKDIR /app
 
 # Enable Yarn 4
 RUN corepack enable && corepack prepare yarn@4.8.1 --activate
 
-# Copy monorepo files
-COPY package.json yarn.lock .yarn .yarnrc.yml ./
+# Copy monorepo root files (NO .yarn/)
+COPY package.json yarn.lock .yarnrc.yml ./
 COPY .env* ./
 
-# Copy the client workspace only
-COPY app/client ./app/client
+# Copy entire app directory (so Yarn sees workspace structure)
+COPY app/ app/
 
-WORKDIR /app/app/client
-
-# Install dependencies
+# Install dependencies (Yarn auto-downloads its binary)
 RUN yarn install
 
-# Set variables
-ARG API_URL
-ARG NODE_ENV=production
-ENV API_URL=$API_URL
-ENV NODE_ENV=$NODE_ENV
-ENV PATH="./node_modules/.bin:$PATH"
-
-# Build step
+# Build client
+WORKDIR /app/app/client
 RUN yarn build
+
 
 # Stage 2: Production runtime
 FROM nginx:1.25-alpine
+
+# Copy built files
 COPY --from=builder /app/app/client/dist /usr/share/nginx/html
+
+# Copy NGINX config
 COPY app/client/nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 3000
+
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
