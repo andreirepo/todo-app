@@ -1,17 +1,16 @@
-version: '3.8'
-
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v2.11
     container_name: traefik
+    user: root
     ports:
       - "80:80"
     command:
       - "--api.dashboard=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=todo-app_traefik-net"
       - "--log.level=DEBUG"
       - "--accesslog=true"
     volumes:
@@ -24,11 +23,11 @@ services:
       - "traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.entrypoints=web"
-  
+
   todo-db:
     image: mongo:4.4
     container_name: todo-db
-    restart : unless-stopped
+    restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
@@ -85,7 +84,7 @@ services:
       - "traefik.http.services.todo-api.loadbalancer.server.port=5000"
 
   todo-fe:
-    build: 
+    build:
       context: .
       dockerfile: app/client/Dockerfile
       args:
@@ -93,17 +92,11 @@ services:
         BASE_URL: /
         NODE_ENV: development
     container_name: todo-fe
-    environment:
-      NODE_ENV: development
-      API_URL: /api
-      BASE_URL: /
     depends_on:
       todo-be:
         condition: service_healthy
     networks:
       - traefik-net
-    ports:
-    - "3000:80" 
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
