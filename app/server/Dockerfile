@@ -3,17 +3,15 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Enable Corepack and install Yarn 4
+# Enable Corepack
 RUN corepack enable && corepack prepare yarn@4.8.1 --activate
 
-# Copy monorepo root files (no .yarn/)
+# 👇 COPY ENTIRE MONOREPO STRUCTURE FIRST
 COPY package.json yarn.lock .yarnrc.yml ./
+COPY app/ app/
 
-# Install dependencies (Yarn will auto-download its binary)
+# 👇 NOW install — Yarn will detect workspaces
 RUN yarn install --inline-builds
-
-# Copy server source code
-COPY app/server app/server
 
 # Build server
 RUN yarn workspace server run build
@@ -24,22 +22,17 @@ FROM node:18-alpine AS runtime
 
 WORKDIR /app
 
-# Install curl for health checks
 RUN apk add --no-cache curl
-
-# Enable Corepack again in runtime (for consistency)
 RUN corepack enable && corepack prepare yarn@4.8.1 --activate
 
 # Copy root files
 COPY package.json yarn.lock .yarnrc.yml ./
-
-# Copy server package.json
 COPY app/server/package.json app/server/package.json
 
-# Install only production dependencies for the server workspace
+# Install only server prod deps
 RUN yarn workspaces focus server --production
 
-# Copy built server code
+# Copy built code
 COPY --from=builder /app/app/server/dist app/server/dist
 
 WORKDIR /app/app/server
