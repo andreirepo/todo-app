@@ -2,16 +2,24 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-// Load environment variables based on NODE_ENV
-const envMode = process.env.NODE_ENV || 'production';
+// Safe environment variable handling for Docker
+const getEnvVar = (key, defaultValue) => {
+  // If running in Docker, process.env[key] is set via ARG/ENV
+  if (process.env.NODE_ENV === 'production' && process.env[key]) {
+    return process.env[key];
+  }
+  
+  // For local development, load from .env files
+  if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config({ path: path.resolve(__dirname, `../../.env.${process.env.NODE_ENV}`) });
+    require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+  }
+  
+  return process.env[key] || defaultValue;
+};
 
-// Try loading environment-specific file first
-require('dotenv').config({ path: path.resolve(__dirname, `../../.env.${envMode}`) });
-// Fallback to default .env
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
-
-// For Docker builds, if API_URL is passed directly as env var, respect it
-// This maintains backward compatibility with the existing Docker setup
+const API_URL = getEnvVar('API_URL', '/api');
+const BASE_URL = getEnvVar('BASE_URL', '/');
 
 module.exports = {
   mode: process.env.NODE_ENV || 'production',
@@ -19,7 +27,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: process.env.BASE_URL || '/',
+    publicPath: BASE_URL,
     clean: true
   },
   devServer: {
@@ -78,7 +86,7 @@ module.exports = {
       filename: 'index.html'
     }),
     new webpack.DefinePlugin({
-      'process.env.API_URL': JSON.stringify(process.env.API_URL),
+      'process.env.API_URL': JSON.stringify(API_URL),
     })
   ],
 };
