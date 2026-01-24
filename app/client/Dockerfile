@@ -5,7 +5,7 @@ WORKDIR /app
 RUN corepack enable && corepack prepare yarn@4.8.1 --activate
 
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN yarn install --immutable  # ← Add --immutable for reproducibility
+RUN yarn install
 
 COPY app/ app/
 COPY .env* ./
