@@ -1,14 +1,20 @@
 /* Global Reset and Variables */
 :root {
-  /* Primary Colors */
-  --primary-color: #0d9488;
-  --primary-hover: #0f766e;
-  --secondary-color: #64748b;
-  --success-color: #16a34a;
-  --danger-color: #dc2626;
-  --warning-color: #ea580c;
-  
-  /* Neutral Colors (Slate-based) */
+  /* Primary Action Colors */
+  --primary-color: #0d9488;        /* Teal-600 */
+  --primary-hover: #0f766e;        /* Teal-700 */
+  --primary-light: #ccfbf1;        /* Teal-200 */
+  --primary-border: #5eead4;       /* Teal-300 */
+
+  /* Status & Feedback */
+  --success-color: #16a34a;        /* Green-600 */
+  --success-light: #dcfce7;        /* Green-100 */
+  --danger-color: #dc2626;         /* Red-600 */
+  --danger-light: #fee2e2;         /* Red-100 */
+  --warning-color: #ea580c;        /* Amber-600 */
+  --info-color: #0284c7;           /* Sky-600 */
+
+  /* Neutral UI Palette */
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
   --gray-200: #e2e8f0;
@@ -19,16 +25,55 @@
   --gray-700: #334155;
   --gray-800: #1e293b;
   --gray-900: #0f172a;
-  
+
   /* Backgrounds */
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
-  
+  --bg-input: #ffffff;
+
   /* Text */
-  --text-primary: #0f172a;    
-  --text-secondary: #334155;   
-  --text-muted: #64748b;     
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-on-primary: #ffffff;
+
+  /* Todo-Specific States */
+  --todo-bg-default: var(--bg-primary);
+  --todo-bg-completed: var(--success-light);
+  --todo-border-default: var(--gray-200);
+  --todo-border-hover: var(--gray-300);
+  --todo-text-completed: var(--gray-500);
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
 }
 
 /* Global Reset */
@@ -84,7 +129,7 @@ body {
   left: 0;
   right: 0;
   padding: var(--spacing-sm) 0;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(11, 116, 108, 0.15); /* Teal-600 at 15% opacity */
   backdrop-filter: blur(8px);
   z-index: 10;
   display: flex;
@@ -95,13 +140,13 @@ body {
 
 .footer-text {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   margin: 0;
   font-weight: 400;
 }
 
 .footer-link {
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
   text-decoration: none;
   font-weight: 500;
   transition: all var(--transition-fast);
@@ -110,8 +155,7 @@ body {
 }
 
 .footer-link:hover {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.2);
   text-decoration: none;
 }
 
@@ -205,39 +249,60 @@ p {
 
 .btn-primary {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--text-on-primary);
+  border: 1px solid var(--primary-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
   background-color: var(--gray-100);
   color: var(--text-primary);
+  border: 1px solid var(--gray-300);
 }
 
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--gray-200);
+  border-color: var(--gray-400);
 }
 
 .btn-danger {
   background-color: var(--danger-color);
-  color: white;
+  color: var(--text-on-primary);
+  border: 1px solid var(--danger-color);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #dc2626;
+  background-color: #b91c1c;
+  border-color: #b91c1c;
 }
 
 .btn-ghost {
   background-color: transparent;
   color: var(--text-secondary);
+  border: 1px solid transparent;
 }
 
 .btn-ghost:hover:not(:disabled) {
   background-color: var(--gray-100);
   color: var(--text-primary);
+  border-color: var(--gray-200);
+}
+
+/* New: Outline Button */
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--primary-light);
 }
 
 /* Form Elements */
@@ -247,19 +312,44 @@ p {
   font-size: 0.875rem;
   border: 1px solid var(--gray-300);
   border-radius: var(--radius-md);
-  background-color: var(--bg-primary);
+  background-color: var(--bg-input);
   color: var(--text-primary);
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.1);
+  box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .input::placeholder {
   color: var(--text-muted);
+}
+
+/* Todo Item Specific Styling */
+.todo-item {
+  padding: var(--spacing-md);
+  border: 1px solid var(--todo-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--todo-bg-default);
+  transition: all var(--transition-fast);
+  margin-bottom: var(--spacing-sm);
+}
+
+.todo-item:hover {
+  border-color: var(--todo-border-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.todo-item.completed {
+  background-color: var(--todo-bg-completed);
+  opacity: 0.9;
+}
+
+.todo-item.completed .todo-text {
+  color: var(--todo-text-completed);
+  text-decoration: line-through;
 }
 
 /* Responsive Design */
@@ -284,7 +374,7 @@ p {
   }
   
   .app-footer {
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(11, 116, 108, 0.2);
     backdrop-filter: blur(6px);
     min-height: 2.25rem;
     padding: var(--spacing-xs) 0;
@@ -310,7 +400,7 @@ p {
   }
   
   .app-footer {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(11, 116, 108, 0.25);
     backdrop-filter: blur(4px);
     min-height: 2rem;
     padding: var(--spacing-xs) 0;
@@ -321,59 +411,55 @@ p {
   }
 }
 
-/* Toast Color Styling Only */
+/* Toast Color Styling - Solid Colors for Professional Look */
 .Toastify__toast--success {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(21, 128, 61, 0.95));
+  background: var(--success-color);
   color: white;
 }
 
 .Toastify__toast--error {
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.95), rgba(239, 68, 68, 0.95));
+  background: var(--danger-color);
   color: white;
 }
 
 .Toastify__toast--info {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(67, 56, 202, 0.95));
+  background: var(--info-color);
   color: white;
 }
 
 .Toastify__toast--warning {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95));
+  background: var(--warning-color);
   color: white;
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-primary: #1e293b;
-    --bg-secondary: #0f172a;
-    --bg-tertiary: #334155;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-input: #334155;
     --text-primary: #f8fafc;
     --text-secondary: #cbd5e1;
-    --text-muted: #64748b;
-    --gray-100: #334155;
+    --text-muted: #94a3b8;
     --gray-200: #475569;
     --gray-300: #64748b;
+    
+    /* Todo in dark mode */
+    --todo-bg-default: #1e293b;
+    --todo-bg-completed: #064e3b; /* Dark green */
+    --todo-text-completed: #94a3b8;
   }
   
   body {
     background: var(--bg-secondary);
   }
 
-  /* Dark mode toast color adjustments */
-  .Toastify__toast--success {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(21, 128, 61, 0.9));
+  .input {
+    background-color: var(--bg-input);
+    border-color: var(--gray-300);
   }
   
-  .Toastify__toast--error {
-    background: linear-gradient(135deg, rgba(248, 113, 113, 0.9), rgba(239, 68, 68, 0.9));
-  }
-  
-  .Toastify__toast--info {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(67, 56, 202, 0.9));
-  }
-  
-  .Toastify__toast--warning {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9));
+  .app-footer {
+    background: rgba(11, 116, 108, 0.25);
   }
 }
