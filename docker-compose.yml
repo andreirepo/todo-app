@@ -8,17 +8,18 @@ services:
       - "443:443"
     command:
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=todo-app_traefik-net"
-      - "--certificatesresolvers.le.acme.email=andrei.repo@gmail.com"  # ← Your email
-      - "--certificatesresolvers.le.acme.storage=/acme/acme.json"       # ← Cert storage
-      - "--certificatesresolvers.le.acme.tlschallenge=true"   
+      - "--certificatesresolvers.le.acme.email=andrei.repo@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/acme/acme.json"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
       - "--log.level=DEBUG"
       - "--accesslog=true"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./acme:/acme 
+      - ./acme:/acme
     networks:
       - traefik-net
     restart: unless-stopped
@@ -83,13 +84,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.todo-api.rule=Host(`todo.andreiqa.click`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.todo-api.entrypoints=web"
+      - "traefik.http.routers.todo-api.entrypoints=websecure"
       - "traefik.http.routers.todo-api.service=todo-api"
+      - "traefik.http.routers.todo-api.tls.certresolver=le"
       - "traefik.http.services.todo-api.loadbalancer.server.port=5000"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.todo-frontend-http.rule=Host(`todo.andreiqa.click`)"
-      - "traefik.http.routers.todo-frontend-http.entrypoints=web"
-      - "traefik.http.routers.todo-frontend-http.middlewares=redirect-to-https"
 
   todo-fe:
     build:
@@ -107,16 +105,20 @@ services:
       - traefik-net
     restart: unless-stopped
     labels:
+      # HTTPS router (main)
       - "traefik.enable=true"
-      - "traefik.http.routers.todo-frontend.rule=Host(`todo.andreiqa.click`)" 
+      - "traefik.http.routers.todo-frontend.rule=Host(`todo.andreiqa.click`)"
       - "traefik.http.routers.todo-frontend.entrypoints=websecure"
-      - "traefik.http.routers.todo-frontend.entrypoints=web"
       - "traefik.http.routers.todo-frontend.service=todo-frontend"
       - "traefik.http.routers.todo-frontend.tls.certresolver=le"
       - "traefik.http.services.todo-frontend.loadbalancer.server.port=80"
+      
+      # HTTP router (redirect to HTTPS)
       - "traefik.http.routers.todo-frontend-http.rule=Host(`todo.andreiqa.click`)"
       - "traefik.http.routers.todo-frontend-http.entrypoints=web"
       - "traefik.http.routers.todo-frontend-http.middlewares=redirect-to-https"
+      
+      # Middleware definition
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 networks:
