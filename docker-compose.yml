@@ -6,7 +6,6 @@ services:
     ports:
       - "80:80"
     command:
-      - "--api.dashboard=true"
       - "--entrypoints.web.address=:80"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -20,7 +19,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)"
+      - "traefik.http.routers.todo-frontend.rule=Host(`todo.andreiqa.click`)"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.entrypoints=web"
 
