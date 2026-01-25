@@ -1,6 +1,7 @@
 {
   "name": "todo-app",
   "private": true,
+  "author": "Andrei Repo",
   "workspaces": [
     "app/client",
     "app/server"
