@@ -77,7 +77,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.todo-api.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.todo-api.rule=Host(`todo.andreiqa.click`) && PathPrefix(`/api`)"
       - "traefik.http.routers.todo-api.entrypoints=web"
       - "traefik.http.routers.todo-api.service=todo-api"
       - "traefik.http.services.todo-api.loadbalancer.server.port=5000"
@@ -99,7 +99,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.todo-frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.todo-frontend.rule=Host(`todo.andreiqa.click`)" 
       - "traefik.http.routers.todo-frontend.entrypoints=web"
       - "traefik.http.routers.todo-frontend.service=todo-frontend"
       - "traefik.http.services.todo-frontend.loadbalancer.server.port=80"
