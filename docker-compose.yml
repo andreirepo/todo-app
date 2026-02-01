@@ -4,19 +4,19 @@ services:
     container_name: traefik
     user: root
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     command:
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=todo-app_traefik-net"
-      - "--certificatesresolvers.le.acme.email=andrei.repo@gmail.com"
-      - "--certificatesresolvers.le.acme.storage=/acme/acme.json"
-      - "--certificatesresolvers.le.acme.tlschallenge=true"
-      - "--log.level=DEBUG"
-      - "--accesslog=true"
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.websecure.address=:443'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--providers.docker.network=todo-app_traefik-net'
+      - '--certificatesresolvers.le.acme.email=andrei.repo@gmail.com'
+      - '--certificatesresolvers.le.acme.storage=/acme/acme.json'
+      - '--certificatesresolvers.le.acme.tlschallenge=true'
+      - '--log.level=DEBUG'
+      - '--accesslog=true'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./acme:/acme
@@ -24,17 +24,17 @@ services:
       - traefik-net
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.entrypoints=web"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)'
+      - 'traefik.http.routers.traefik.service=api@internal'
+      - 'traefik.http.routers.traefik.entrypoints=web'
 
   todo-db:
     image: mongo:4.4
     container_name: todo-db
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -65,15 +65,15 @@ services:
     environment:
       NODE_OPTIONS: ${NODE_ENV:-development} --enable-source-maps
       UV_THREADPOOL_SIZE: ${UV_THREADPOOL_SIZE}
-      MONGO_URI: "mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@todo-db:27017/todos?authSource=admin"
-      BASE_PATH: "/"
+      MONGO_URI: 'mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@todo-db:27017/todos?authSource=admin'
+      BASE_PATH: '/'
     ports:
-      - "5000:5000"
+      - '5000:5000'
     depends_on:
       todo-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/health']
       interval: 15s
       timeout: 10s
       start_period: 60s
@@ -82,12 +82,12 @@ services:
       - traefik-net
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.todo-api.rule=Host(`todo.andreiqa.click`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.todo-api.entrypoints=websecure"
-      - "traefik.http.routers.todo-api.service=todo-api"
-      - "traefik.http.routers.todo-api.tls.certresolver=le"
-      - "traefik.http.services.todo-api.loadbalancer.server.port=5000"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.todo-api.rule=Host(`todo.andreiqa.click`) && PathPrefix(`/api`)'
+      - 'traefik.http.routers.todo-api.entrypoints=websecure'
+      - 'traefik.http.routers.todo-api.service=todo-api'
+      - 'traefik.http.routers.todo-api.tls.certresolver=le'
+      - 'traefik.http.services.todo-api.loadbalancer.server.port=5000'
 
   todo-fe:
     build:
@@ -106,20 +106,42 @@ services:
     restart: unless-stopped
     labels:
       # HTTPS router (main)
-      - "traefik.enable=true"
-      - "traefik.http.routers.todo-frontend.rule=Host(`todo.andreiqa.click`)"
-      - "traefik.http.routers.todo-frontend.entrypoints=websecure"
-      - "traefik.http.routers.todo-frontend.service=todo-frontend"
-      - "traefik.http.routers.todo-frontend.tls.certresolver=le"
-      - "traefik.http.services.todo-frontend.loadbalancer.server.port=80"
-      
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.todo-frontend.rule=Host(`todo.andreiqa.click`)'
+      - 'traefik.http.routers.todo-frontend.entrypoints=websecure'
+      - 'traefik.http.routers.todo-frontend.service=todo-frontend'
+      - 'traefik.http.routers.todo-frontend.tls.certresolver=le'
+      - 'traefik.http.services.todo-frontend.loadbalancer.server.port=80'
+
       # HTTP router (redirect to HTTPS)
-      - "traefik.http.routers.todo-frontend-http.rule=Host(`todo.andreiqa.click`)"
-      - "traefik.http.routers.todo-frontend-http.entrypoints=web"
-      - "traefik.http.routers.todo-frontend-http.middlewares=redirect-to-https"
-      
+      - 'traefik.http.routers.todo-frontend-http.rule=Host(`todo.andreiqa.click`)'
+      - 'traefik.http.routers.todo-frontend-http.entrypoints=web'
+      - 'traefik.http.routers.todo-frontend-http.middlewares=redirect-to-https'
+
       # Middleware definition
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
+
+  portfolio:
+    build:
+      context: /home/ubuntu/apps/qa-portfolio
+      dockerfile: Dockerfile
+    container_name: portfolio
+    networks:
+      - traefik-net
+    restart: unless-stopped
+    labels:
+      # HTTPS router (main)
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.portfolio.rule=Host(`andreirepo.com`)'
+      - 'traefik.http.routers.portfolio.entrypoints=websecure'
+      - 'traefik.http.routers.portfolio.service=portfolio'
+      - 'traefik.http.routers.portfolio.tls.certresolver=le'
+      - 'traefik.http.services.portfolio.loadbalancer.server.port=80'
+
+      # HTTP router (redirect to HTTPS)
+      - 'traefik.http.routers.portfolio-http.rule=Host(`andreirepo.com`)'
+      - 'traefik.http.routers.portfolio-http.entrypoints=web'
+      - 'traefik.http.routers.portfolio-http.middlewares=redirect-to-https'
 
 networks:
   traefik-net:
