@@ -130,7 +130,7 @@ services:
       - traefik-net
     restart: unless-stopped
     labels:
-      # HTTPS router (main)
+      # HTTPS router (main) - Root domain
       - 'traefik.enable=true'
       - 'traefik.http.routers.portfolio.rule=Host(`andreirepo.com`)'
       - 'traefik.http.routers.portfolio.entrypoints=websecure'
@@ -138,10 +138,20 @@ services:
       - 'traefik.http.routers.portfolio.tls.certresolver=le'
       - 'traefik.http.services.portfolio.loadbalancer.server.port=80'
 
+      # HTTPS router for www subdomain (redirect to root)
+      - 'traefik.http.routers.portfolio-www.rule=Host(`www.andreirepo.com`)'
+      - 'traefik.http.routers.portfolio-www.entrypoints=websecure'
+      - 'traefik.http.routers.portfolio-www.middlewares=redirect-to-root'
+      - 'traefik.http.routers.portfolio-www.tls.certresolver=le'
+
       # HTTP router (redirect to HTTPS)
-      - 'traefik.http.routers.portfolio-http.rule=Host(`andreirepo.com`)'
+      - 'traefik.http.routers.portfolio-http.rule=Host(`andreirepo.com`) || Host(`www.andreirepo.com`)'
       - 'traefik.http.routers.portfolio-http.entrypoints=web'
       - 'traefik.http.routers.portfolio-http.middlewares=redirect-to-https'
+
+      # Middleware definitions
+      - 'traefik.http.middlewares.redirect-to-root.redirectregex.regex=^https://www.andreirepo.com/(.*)'
+      - 'traefik.http.middlewares.redirect-to-root.redirectregex.replacement=https://andreirepo.com/$${1}'
 
 networks:
   traefik-net:
