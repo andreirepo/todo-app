@@ -97,4 +97,4 @@ Perfect for testing frameworks:
 ## Demo
 
 - App: https://todo.andreiqa.click/
-- Credentials: `demo` / `letmein123`
+- Credentials: `demo@todo.com` / `letmein123`
