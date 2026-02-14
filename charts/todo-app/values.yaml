@@ -63,8 +63,8 @@ ingress:
 
 mongodb:
   enabled: true
-  # MongoDB Atlas connection string
-  uri: "mongodb+srv://username:password@cluster.mongodb.net/todos?retryWrites=true&w=majority"
+  # MongoDB Atlas connection string (will be overridden by secrets)
+  uri: ""
 
 resources:
   backend:
