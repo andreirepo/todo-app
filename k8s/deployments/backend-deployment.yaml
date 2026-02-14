@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-backend
+  namespace: todo-app
+  labels:
+    app: todo-app
+    component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: todo-app
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: todo-app
+        component: backend
+    spec:
+      containers:
+      - name: todo-backend
+        image: ghcr.io/yourusername/todo-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: todo-app-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: todo-app-config
+              key: PORT
+        - name: UV_THREADPOOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: todo-app-config
+              key: UV_THREADPOOL_SIZE
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: mongo-credentials
+              key: mongodb-uri
+        - name: JWT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: todo-app-config
+              key: JWT_SECRET
+        - name: JWT_EXPIRES_IN
+          valueFrom:
+            configMapKeyRef:
+              name: todo-app-config
+              key: JWT_EXPIRES_IN
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      restartPolicy: Always
