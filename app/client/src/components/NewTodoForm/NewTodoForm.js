@@ -23,19 +23,19 @@ const NewTodoForm = (props) => {
 	return (
 		<div
 			className="new-todo-form"
-			data-testid="todo-form"
+			data-id="todo-form"
 		>
 			<div className="new-todo">
 				<input
 					className="todo-input"
-					data-testid="todo-input"
+					data-id="todo-input"
 					type="text"
 					placeholder="Add a new task..."
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
 					onKeyDown={handleKeyDown}
 				/>
-				<button onClick={handleCreateTodo} className="new-todo-button" data-testid="create-button" disabled={!inputValue.trim()}>
+				<button onClick={handleCreateTodo} className="new-todo-button" data-id="todo-submit" disabled={!inputValue.trim()}>
 					<i className="fas fa-plus"></i>
 				</button>
 			</div>
