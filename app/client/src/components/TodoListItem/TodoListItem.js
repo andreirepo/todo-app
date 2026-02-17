@@ -33,9 +33,9 @@ const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) 
 	};
 
     return (
-        <div className={`todo-item-container ${className}`}>
+        <div className={`todo-item-container ${className}`} data-id="todo-item-container">
             <div className="todo-content-wrapper">
-                <h3 className={`${className}-title todo-text`}>{todo.text}</h3>
+                <h3 className={`${className}-title todo-text`} data-id="todo-item-text">{todo.text}</h3>
                 <p className="todo-date">{'Created at: '}<Moment format="YYYY/MM/DD">{todo.date}</Moment></p>
             </div>
             <div className="buttons-container">
@@ -43,7 +43,7 @@ const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) 
                     <button
                         onClick={handleComplete}
                         className="completed-button"
-                        data-testid="complete-button"
+                        data-id="todo-item-checkbox"
                         disabled={isCompleting}
                     >
                         {isCompleting ? (
@@ -56,7 +56,7 @@ const TodoListItem = ({ todo, onRemovePressed, onCompletedPressed, className }) 
                 <button
                     onClick={handleRemove}
                     className="remove-button"
-                    data-testid="remove-button"
+                    data-id="todo-item-delete"
                     disabled={isDeleting}
                 >
                     {isDeleting ? (
