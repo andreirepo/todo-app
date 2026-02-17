@@ -27,7 +27,7 @@ const TodoList = ({
 		startLoadingTodos();
 	}, [startLoadingTodos]);
 
-	const loadingMessage = <div className="loader" data-testid="spinner">Loading...</div>;
+	const loadingMessage = <div className="loader" data-id="spinner">Loading...</div>;
 	
 	// Safe sort function that handles missing createdAt
 	const safeSort = (a, b) => {
@@ -38,7 +38,7 @@ const TodoList = ({
 	};
 	
 	const content = (
-		<div className="list-wrapper">
+		<div className="list-wrapper" data-id="todo-list-container">
 			<NewTodoForm />
 			{incompletedTodos.length === 0 && completedTodos.length === 0 && (
 				<div className="no-todos">
