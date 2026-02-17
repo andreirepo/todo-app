@@ -25,7 +25,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister, loading, error }) => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container" data-id="login-form">
       <div className="auth-header">
         <h1 className="auth-title">Welcome back</h1>
         <p className="auth-subtitle">Sign in to your account</p>
@@ -39,6 +39,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister, loading, error }) => {
             id="email"
             name="email"
             className="auth-input"
+            data-id="email-input"
             value={email}
             onChange={handleChange}
             required
@@ -54,6 +55,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister, loading, error }) => {
               id="password"
               name="password"
               className="auth-input password-input"
+              data-id="password-input"
               value={password}
               onChange={handleChange}
               required
@@ -71,11 +73,12 @@ const LoginForm = ({ onLogin, onSwitchToRegister, loading, error }) => {
           </div>
         </div>
         
-        {error && <div className="auth-error">{error}</div>}
+        {error && <div className="auth-error" data-id="error-message">{error}</div>}
         
         <button 
           type="submit" 
           className="auth-button"
+          data-id="sign-in-button"
           disabled={loading}
         >
           {loading ? 'Signing in...' : 'Sign in'}
