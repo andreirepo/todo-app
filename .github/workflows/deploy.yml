@@ -82,6 +82,8 @@ jobs:
             API_URL=/apps/todo/api
             BASE_URL=/apps/todo/
             NODE_ENV=production
+          provenance: false
+          sbom: false
 
       - name: Build and push backend
         uses: docker/build-push-action@v6
@@ -94,6 +96,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
+          sbom: false
 
   deploy:
     needs: [build-and-test, build-and-push]
