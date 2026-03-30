@@ -138,14 +138,12 @@ jobs:
 
           ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<EOF
             cd /home/${{ env.SERVER_USER }}/apps/todo-app
-            # Create .env file from GitHub secrets
-            cat > .env <<ENVEOF
-            MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
-            MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
-            NODE_ENV=production
-            UV_THREADPOOL_SIZE=4
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            ENVEOF
+            # Create .env file from GitHub secrets using echo
+            echo "MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}" > .env
+            echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}" >> .env
+            echo "NODE_ENV=production" >> .env
+            echo "UV_THREADPOOL_SIZE=4" >> .env
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
             docker network ls | grep -q todo-app_traefik-net || docker network create todo-app_traefik-net
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
