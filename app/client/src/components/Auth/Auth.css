@@ -169,49 +169,48 @@
 }
 
 .todo-header {
-  background: var(--primary-color);
-  color: white;
-  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--gray-200);
+  padding: var(--spacing-md) var(--spacing-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .todo-header-content h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
   margin: 0;
-  color: white;
+  color: var(--text-primary);
 }
 
 .todo-header-content p {
-  margin: 0.25rem 0 0 0;
-  opacity: 0.9;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .logout-button {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  background: transparent;
+  border: 1px solid var(--gray-300);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
-  backdrop-filter: blur(10px);
 }
 
 .logout-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
+  background: var(--gray-100);
+  color: var(--text-primary);
+  border-color: var(--gray-400);
 }
 
 .todo-content {
   flex: 1;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   overflow-y: auto;
 }
 

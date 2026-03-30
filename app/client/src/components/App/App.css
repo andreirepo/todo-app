@@ -339,12 +339,13 @@ p {
 /* Responsive Design */
 @media (max-width: 640px) {
   .app {
-    padding: var(--spacing-md);
+    padding: 0;
     padding-bottom: 3rem;
   }
   
   .container {
     max-width: 100%;
+    border-radius: 0;
   }
   
   h1 {
@@ -354,8 +355,12 @@ p {
 
 @media (max-width: 480px) {
   .app {
-    padding: var(--spacing-sm);
+    padding: 0;
     padding-bottom: 3rem;
+  }
+  
+  .container {
+    border-radius: 0;
   }
   
   .footer-text {
