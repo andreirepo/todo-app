@@ -133,7 +133,7 @@ jobs:
              sudo chown ${{ env.SERVER_USER }}:${{ env.SERVER_USER }} /home/${{ env.SERVER_USER }}/apps/todo-app && \
              sudo chmod 755 /home/${{ env.SERVER_USER }}/apps/todo-app"
 
-          rsync -az --delete -e "ssh" . \
+          rsync -az --delete -e "ssh" --exclude='acme/' . \
             ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/home/${{ env.SERVER_USER }}/apps/todo-app/
 
           ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<EOF
