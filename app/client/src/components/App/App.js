@@ -11,11 +11,19 @@ const App = () => (
     </div>
     <footer className="app-footer">
       <p className="footer-text">
-        Built with ❤️ by <a href="https://github.com/andreirepo" target="_blank" rel="noopener noreferrer" className="footer-link">Andrei</a>
+        &copy; 2026{' '}
+        <a
+          href="https://andreirepo.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer-link"
+        >
+          Andrei Repo
+        </a>
       </p>
     </footer>
     <ToastContainer
-      position="top-right" 
+      position="top-right"
       autoClose={3000}
       hideProgressBar={true}
       newestOnTop={false}
