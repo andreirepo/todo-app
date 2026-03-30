@@ -53,14 +53,7 @@ services:
       - traefik-net
 
   todo-be:
-    env_file:
-      - .env
-    build:
-      context: .
-      dockerfile: app/server/Dockerfile
-      args:
-        NODE_ENV: ${NODE_ENV}
-        NPM_TOKEN: dummy_value
+    image: ghcr.io/andreirepo/todo-app/todo-backend:latest
     container_name: todo-be
     environment:
       NODE_OPTIONS: "--enable-source-maps"
@@ -92,13 +85,7 @@ services:
       - "traefik.http.middlewares.todo-api-strip.stripprefix.prefixes=/apps/todo"
 
   todo-fe:
-    build:
-      context: .
-      dockerfile: app/client/Dockerfile
-      args:
-        API_URL: /apps/todo/api
-        BASE_URL: /apps/todo/
-        NODE_ENV: production
+    image: ghcr.io/andreirepo/todo-app/todo-frontend:latest
     container_name: todo-fe
     depends_on:
       todo-be:
