@@ -66,7 +66,7 @@ services:
       NODE_OPTIONS: "--enable-source-maps"
       UV_THREADPOOL_SIZE: ${UV_THREADPOOL_SIZE}
       MONGO_URI: "mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@todo-db:27017/todos?authSource=admin"
-      BASE_PATH: "/"
+      BASE_PATH: "/apps/todo"
     ports:
       - "5000:5000"
     depends_on:
@@ -83,20 +83,22 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.todo-api.rule=Host(`todo.andreiqa.click`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.todo-api.rule=Host(`andreirepo.com`) && PathPrefix(`/apps/todo/api`)"
       - "traefik.http.routers.todo-api.entrypoints=websecure"
       - "traefik.http.routers.todo-api.service=todo-api"
+      - "traefik.http.routers.todo-api.middlewares=todo-api-strip"
       - "traefik.http.routers.todo-api.tls.certresolver=le"
       - "traefik.http.services.todo-api.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.todo-api-strip.stripprefix.prefixes=/apps/todo"
 
   todo-fe:
     build:
       context: .
       dockerfile: app/client/Dockerfile
       args:
-        API_URL: /api
-        BASE_URL: /
-        NODE_ENV: development
+        API_URL: /apps/todo/api
+        BASE_URL: /apps/todo/
+        NODE_ENV: production
     container_name: todo-fe
     depends_on:
       todo-be:
@@ -105,53 +107,23 @@ services:
       - traefik-net
     restart: unless-stopped
     labels:
-      # HTTPS router (main)
+      # HTTPS router (main) - Path-based routing
       - "traefik.enable=true"
-      - "traefik.http.routers.todo-frontend.rule=Host(`todo.andreiqa.click`)"
+      - "traefik.http.routers.todo-frontend.rule=Host(`andreirepo.com`) && PathPrefix(`/apps/todo`)"
       - "traefik.http.routers.todo-frontend.entrypoints=websecure"
       - "traefik.http.routers.todo-frontend.service=todo-frontend"
+      - "traefik.http.routers.todo-frontend.middlewares=todo-fe-strip"
       - "traefik.http.routers.todo-frontend.tls.certresolver=le"
       - "traefik.http.services.todo-frontend.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.todo-fe-strip.stripprefix.prefixes=/apps/todo"
 
       # HTTP router (redirect to HTTPS)
-      - "traefik.http.routers.todo-frontend-http.rule=Host(`todo.andreiqa.click`)"
+      - "traefik.http.routers.todo-frontend-http.rule=Host(`andreirepo.com`) && PathPrefix(`/apps/todo`)"
       - "traefik.http.routers.todo-frontend-http.entrypoints=web"
       - "traefik.http.routers.todo-frontend-http.middlewares=redirect-to-https"
 
       # Middleware definition
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-
-  portfolio:
-    build:
-      context: /home/ubuntu/apps/qa-portfolio # Make sure this path is correct
-      dockerfile: Dockerfile
-    container_name: portfolio
-    networks:
-      - traefik-net
-    restart: unless-stopped
-    labels:
-      # HTTPS router (main) - Root domain
-      - "traefik.enable=true"
-      - "traefik.http.routers.portfolio.rule=Host(`andreirepo.com`)"
-      - "traefik.http.routers.portfolio.entrypoints=websecure"
-      - "traefik.http.routers.portfolio.service=portfolio"
-      - "traefik.http.routers.portfolio.tls.certresolver=le"
-      - "traefik.http.services.portfolio.loadbalancer.server.port=80"
-
-      # HTTPS router for www subdomain (redirect to root)
-      - "traefik.http.routers.portfolio-www.rule=Host(`www.andreirepo.com`)"
-      - "traefik.http.routers.portfolio-www.entrypoints=websecure"
-      - "traefik.http.routers.portfolio-www.middlewares=redirect-to-root"
-      - "traefik.http.routers.portfolio-www.tls.certresolver=le"
-
-      # HTTP router (redirect to HTTPS)
-      - "traefik.http.routers.portfolio-http.rule=Host(`andreirepo.com`) || Host(`www.andreirepo.com`)"
-      - "traefik.http.routers.portfolio-http.entrypoints=web"
-      - "traefik.http.routers.portfolio-http.middlewares=redirect-to-https"
-
-      # Middleware definitions
-      - "traefik.http.middlewares.redirect-to-root.redirectregex.regex=^https://www.andreirepo.com/(.*)"
-      - "traefik.http.middlewares.redirect-to-root.redirectregex.replacement=https://andreirepo.com/$1"
 
 networks:
   traefik-net:

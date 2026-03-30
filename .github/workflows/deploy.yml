@@ -12,8 +12,30 @@ env:
   IMAGE_NAME_BACKEND: ${{ github.repository }}/todo-backend
 
 jobs:
+  build-and-test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run linting (if available)
+        run: yarn lint || echo "No lint script found"
+
   build-and-push:
-    runs-on: ubuntu-latest
+    needs: build-and-test
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
@@ -48,77 +70,128 @@ jobs:
       - name: Build and push frontend
         uses: docker/build-push-action@v6
         with:
-          context: ./app/client
-          platforms: linux/amd64,linux/arm64
+          context: .
+          file: ./app/client/Dockerfile
+          platforms: linux/amd64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            API_URL=/apps/todo/api
+            BASE_URL=/apps/todo/
+            NODE_ENV=production
 
       - name: Build and push backend
         uses: docker/build-push-action@v6
         with:
-          context: ./app/server
-          platforms: linux/amd64,linux/arm64
+          context: .
+          file: ./app/server/Dockerfile
+          platforms: linux/amd64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
+    needs: [build-and-test, build-and-push]
+    runs-on: self-hosted
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          version: 'v1.29.0'
+          ssh-private-key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
 
-      - name: Configure kubectl
+      - name: Add server to known hosts
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Kubernetes
+      - name: Backup current deployment
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
-          # Apply namespace
-          kubectl apply -f k8s/namespace.yaml
-          
-          # Apply secrets (if they exist)
-          if [ -f k8s/secrets/mongo-secret.yaml ]; then
-            kubectl apply -f k8s/secrets/mongo-secret.yaml
-          fi
-          
-          # Apply ConfigMaps
-          kubectl apply -f k8s/configmaps/
-          
-          # Apply deployments
-          kubectl apply -f k8s/deployments/
-          
-          # Apply services
-          kubectl apply -f k8s/services/
-          
-          # Apply ingress
-          kubectl apply -f k8s/ingress/
-          
-          # Wait for rollout
-          kubectl rollout status deployment/todo-frontend -n todo-app --timeout=300s
-          kubectl rollout status deployment/todo-backend -n todo-app --timeout=300s
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} \
+            "cd /home/${{ env.SERVER_USER }}/apps/todo-app && \
+             docker-compose -f docker-compose.yml ps --format json > /tmp/todo-backup-state.json 2>/dev/null || true"
 
-      - name: Notify deployment status
-        if: always()
+      - name: Deploy to server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment successful!"
-          else
-            echo "❌ Deployment failed!"
-            exit 1
-          fi
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} \
+            "sudo mkdir -p /home/${{ env.SERVER_USER }}/apps/todo-app && \
+             sudo chown ${{ env.SERVER_USER }}:${{ env.SERVER_USER }} /home/${{ env.SERVER_USER }}/apps/todo-app && \
+             sudo chmod 755 /home/${{ env.SERVER_USER }}/apps/todo-app"
+
+          rsync -az --delete -e "ssh" . \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/home/${{ env.SERVER_USER }}/apps/todo-app/
+
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<EOF
+            cd /home/${{ env.SERVER_USER }}/apps/todo-app
+            docker network ls | grep -q todo-app_traefik-net || docker network create todo-app_traefik-net
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
+            docker-compose -f docker-compose.yml up -d --build
+          EOF
+
+  health-check:
+    needs: deploy
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Wait for service to be ready
+        run: sleep 30
+
+      - name: Health check
+        run: |
+          for i in 1 2 3 4 5; do
+            echo "Health check attempt $i/5..."
+            if curl -sf https://andreirepo.com/apps/todo; then
+              echo "Health check passed!"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Health check failed after 5 attempts"
+          exit 1
+
+  rollback:
+    needs: health-check
+    runs-on: self-hosted
+    if: failure()
+
+    steps:
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Rollback deployment
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          echo "Health check failed! Rolling back deployment..."
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<EOF
+            cd /home/${{ env.SERVER_USER }}/apps/todo-app
+            git checkout HEAD~1
+            docker-compose -f docker-compose.yml down
+            docker-compose -f docker-compose.yml up -d --build
+          EOF
+          echo "Rollback completed"
