@@ -147,7 +147,7 @@ jobs:
             docker network ls | grep -q todo-app_traefik-net || docker network create todo-app_traefik-net
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
-            docker-compose -f docker-compose.yml up -d --build
+            docker-compose -f docker-compose.yml up -d
           EOF
 
   health-check:
