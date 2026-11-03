@@ -1,40 +1,8 @@
 services:
-  traefik:
-    image: traefik:v2.11
-    container_name: traefik
-    user: root
-    ports:
-      - "80:80"
-      - "443:443"
-    command:
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=todo-app_traefik-net"
-      - "--certificatesresolvers.le.acme.email=andrei.repo@gmail.com"
-      - "--certificatesresolvers.le.acme.storage=/acme/acme.json"
-      - "--certificatesresolvers.le.acme.tlschallenge=true"
-      - "--log.level=DEBUG"
-      - "--accesslog=true"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./acme:/acme
-    networks:
-      - traefik-net
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.entrypoints=web"
-
   todo-db:
     image: mongo:4.4
     container_name: todo-db
     restart: unless-stopped
-    ports:
-      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -57,11 +25,9 @@ services:
     container_name: todo-be
     environment:
       NODE_OPTIONS: "--enable-source-maps"
-      UV_THREADPOOL_SIZE: ${UV_THREADPOOL_SIZE}
+      UV_THREADPOOL_SIZE: ${UV_THREADPOOL_SIZE:-4}
       MONGO_URI: "mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@todo-db:27017/todos?authSource=admin"
       BASE_PATH: "/apps/todo"
-    ports:
-      - "5000:5000"
     depends_on:
       todo-db:
         condition: service_healthy
@@ -115,8 +81,11 @@ services:
       - "traefik.http.middlewares.todo-fe-strip.stripprefix.prefixes=/apps/todo"
 
 networks:
+  # Created and owned outside this repo: traefik and cloudflared run from
+  # /home/anre/traefik. Declared external so `up` cannot try to manage it.
   traefik-net:
-    driver: bridge
+    external: true
+    name: todo-app_traefik-net
 
 volumes:
   todo-data:
