@@ -74,7 +74,11 @@ jobs:
           file: ./app/client/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
+          # commit tag is what a rollback targets; latest keeps the plain
+          # `docker compose up` path working for anyone without a state file
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -92,7 +96,9 @@ jobs:
           file: ./app/server/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -140,19 +146,41 @@ jobs:
           rsync -az --delete -e "ssh" --exclude='acme/' . \
             ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/home/${{ env.SERVER_USER }}/apps/todo-app/
 
-          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<EOF
+          # Pull first, write .env second, restart third. If the pull fails the
+          # .env still describes the images that are actually on disk, so a
+          # stray `docker compose up` cannot try to start a tag that was never
+          # fetched.
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<'EOF'
+            set -eu
             cd /home/${{ env.SERVER_USER }}/apps/todo-app
-            # Create .env file from GitHub secrets using echo
-            echo "MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}" > .env
-            echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}" >> .env
-            echo "NODE_ENV=production" >> .env
-            echo "UV_THREADPOOL_SIZE=4" >> .env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+
+            # Deploy state lives outside the rsync target: rsync --delete wipes
+            # everything inside it on every run, including this file.
+            STATE=/home/${{ env.SERVER_USER }}/apps/todo-app-deploy.state
+            PREVIOUS_TAG=$(awk -F= '/^IMAGE_TAG=/{print $2}' "$STATE" 2>/dev/null || true)
+
+            # Written before the pull, so that a failed pull or a failed
+            # restart still leaves the state knowing what to go back to.
+            printf 'IMAGE_TAG=%s\nPREVIOUS_TAG=%s\n' '${{ github.sha }}' "${PREVIOUS_TAG:-}" > "$STATE"
+
             docker network ls | grep -q todo-app_traefik-net || docker network create todo-app_traefik-net
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
-            docker compose -f docker-compose.yml up -d
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
           EOF
+
+          # Streamed from the runner rather than built on the server by a
+          # nested heredoc: no leading whitespace, and a secret containing a
+          # '$' cannot be expanded on the way through.
+          cat <<'EOF' | ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cat > /home/${{ env.SERVER_USER }}/apps/todo-app/.env'
+          MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
+          MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
+          NODE_ENV=production
+          UV_THREADPOOL_SIZE=4
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          IMAGE_TAG=${{ github.sha }}
+          EOF
+
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cd /home/${{ env.SERVER_USER }}/apps/todo-app && docker compose -f docker-compose.yml up -d'
 
   health-check:
     needs: deploy
