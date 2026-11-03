@@ -165,9 +165,14 @@ jobs:
 
       - name: Health check
         run: |
+          # Assert on the app's own markup, not on the status code. Until the
+          # portfolio stopped answering unknown paths with its home page, this
+          # check was passing against that home page: /apps/todo returned 200
+          # with the wrong body, so a deployment that never reached Traefik
+          # still reported success.
           for i in 1 2 3 4 5; do
             echo "Health check attempt $i/5..."
-            if curl -sf https://andreirepo.com/apps/todo; then
+            if curl -sf https://andreirepo.com/apps/todo/ | grep -q 'id="root"'; then
               echo "Health check passed!"
               exit 0
             fi
