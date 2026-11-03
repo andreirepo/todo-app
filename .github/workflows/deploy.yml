@@ -210,9 +210,12 @@ jobs:
           exit 1
 
   rollback:
-    needs: health-check
+    # Runs when the deploy or the health check failed. needs.* is required for
+    # the expressions below; always() because a skipped health check would
+    # otherwise skip this job too.
+    needs: [deploy, health-check]
     runs-on: self-hosted
-    if: failure()
+    if: always() && (needs.deploy.result == 'failure' || needs.health-check.result == 'failure')
 
     steps:
       - name: Setup SSH key
@@ -225,16 +228,47 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Rollback deployment
+      - name: Roll back to the previous image tag
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
-          echo "Health check failed! Rolling back deployment..."
-          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<EOF
+          # The old version ran `git checkout HEAD~1` — but the deployed
+          # directory is an rsync copy, not a clone, so there is no HEAD to
+          # check out and the job failed every time it was needed. And even
+          # with a repo there, `up -d --build` rebuilds from source instead of
+          # restoring a known-good image.
+          #
+          # What it does now: the deploy step records the tag it is about to
+          # run next to the tag it replaced, and this restores the latter.
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<'EOF'
+            set -eu
             cd /home/${{ env.SERVER_USER }}/apps/todo-app
-            git checkout HEAD~1
-            docker compose -f docker-compose.yml down
-            docker compose -f docker-compose.yml up -d --build
+
+            STATE=/home/${{ env.SERVER_USER }}/apps/todo-app-deploy.state
+
+            if [ ! -f "$STATE" ]; then
+              echo "No deploy state on the server — nothing to roll back to."
+              exit 0
+            fi
+
+            . "$STATE"
+
+            if [ -z "${PREVIOUS_TAG:-}" ]; then
+              echo "No previous image tag recorded — this was the first tagged deploy. Nothing to roll back to."
+              exit 0
+            fi
+
+            if [ ! -f .env ]; then
+              echo "No .env on the server: the deploy did not get that far. Nothing to roll back to."
+              exit 0
+            fi
+
+            echo "Rolling back from ${IMAGE_TAG:-unknown} to $PREVIOUS_TAG"
+            sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=$PREVIOUS_TAG|" .env
+            docker compose -f docker-compose.yml up -d
+
+            # Clear the previous tag so a second rollback cannot replay it now
+            # that it is the current one.
+            printf 'IMAGE_TAG=%s\nPREVIOUS_TAG=\n' "$PREVIOUS_TAG" > "$STATE"
           EOF
-          echo "Rollback completed"
