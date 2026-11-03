@@ -15,15 +15,15 @@ fi
 
 # Optional: Stop any previous containers
 echo "🧹 Stopping old containers..."
-docker-compose down
+docker compose down
 
 # Build everything
 echo "🔨 Building full stack..."
-docker-compose build
+docker compose build
 
 # Start services
 echo "📦 Bringing up services..."
-docker-compose up -d
+docker compose up -d
 
 # Wait for SSL certificate issuance (optional but recommended for HTTPS)
 if [ -d "./acme" ]; then
@@ -48,9 +48,9 @@ fi
 
 # Check if containers are running
 echo "📋 Checking container status..."
-if ! docker-compose ps | grep -q "Up"; then
+if ! docker compose ps | grep -q "Up"; then
   echo "❌ Some containers failed to start!"
-  docker-compose logs --tail=10
+  docker compose logs --tail=10
   exit 1
 fi
 

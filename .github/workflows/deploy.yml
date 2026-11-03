@@ -125,7 +125,7 @@ jobs:
         run: |
           ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} \
             "cd /home/${{ env.SERVER_USER }}/apps/todo-app && \
-             docker-compose -f docker-compose.yml ps --format json > /tmp/todo-backup-state.json 2>/dev/null || true"
+             docker compose -f docker-compose.yml ps --format json > /tmp/todo-backup-state.json 2>/dev/null || true"
 
       - name: Deploy to server
         env:
@@ -151,7 +151,7 @@ jobs:
             docker network ls | grep -q todo-app_traefik-net || docker network create todo-app_traefik-net
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
-            docker-compose -f docker-compose.yml up -d
+            docker compose -f docker-compose.yml up -d
           EOF
 
   health-check:
@@ -201,7 +201,7 @@ jobs:
           ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} <<EOF
             cd /home/${{ env.SERVER_USER }}/apps/todo-app
             git checkout HEAD~1
-            docker-compose -f docker-compose.yml down
-            docker-compose -f docker-compose.yml up -d --build
+            docker compose -f docker-compose.yml down
+            docker compose -f docker-compose.yml up -d --build
           EOF
           echo "Rollback completed"
