@@ -76,11 +76,18 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      # entrypoints=web, not websecure: Cloudflare Tunnel delivers plain HTTP to
+      # traefik:80 and Cloudflare terminates TLS. Nothing ever reaches the
+      # websecure entrypoint, so a router declared on it is simply dead.
+      # Priority is explicit because Traefik otherwise ranks routers by rule
+      # length, and the portfolio's rule "Host(a) || Host(www)" (52 chars) is
+      # longer than a Host+PathPrefix rule (50 for the frontend) — so the
+      # portfolio router would win /apps/todo and serve its own 404.
       - "traefik.http.routers.todo-api.rule=Host(`andreirepo.com`) && PathPrefix(`/apps/todo/api`)"
-      - "traefik.http.routers.todo-api.entrypoints=websecure"
+      - "traefik.http.routers.todo-api.entrypoints=web"
+      - "traefik.http.routers.todo-api.priority=200"
       - "traefik.http.routers.todo-api.service=todo-api"
       - "traefik.http.routers.todo-api.middlewares=todo-api-strip"
-      - "traefik.http.routers.todo-api.tls.certresolver=le"
       - "traefik.http.services.todo-api.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.todo-api-strip.stripprefix.prefixes=/apps/todo"
 
@@ -94,23 +101,18 @@ services:
       - traefik-net
     restart: unless-stopped
     labels:
-      # HTTPS router (main) - Path-based routing
+      # Behind the tunnel there is no TLS to terminate here and no ACME to run:
+      # Cloudflare holds the certificate. The redirect-to-https router that used
+      # to sit on the web entrypoint only produced a bounce back into
+      # Cloudflare, so it is gone.
       - "traefik.enable=true"
       - "traefik.http.routers.todo-frontend.rule=Host(`andreirepo.com`) && PathPrefix(`/apps/todo`)"
-      - "traefik.http.routers.todo-frontend.entrypoints=websecure"
+      - "traefik.http.routers.todo-frontend.entrypoints=web"
+      - "traefik.http.routers.todo-frontend.priority=100"
       - "traefik.http.routers.todo-frontend.service=todo-frontend"
       - "traefik.http.routers.todo-frontend.middlewares=todo-fe-strip"
-      - "traefik.http.routers.todo-frontend.tls.certresolver=le"
       - "traefik.http.services.todo-frontend.loadbalancer.server.port=80"
       - "traefik.http.middlewares.todo-fe-strip.stripprefix.prefixes=/apps/todo"
-
-      # HTTP router (redirect to HTTPS)
-      - "traefik.http.routers.todo-frontend-http.rule=Host(`andreirepo.com`) && PathPrefix(`/apps/todo`)"
-      - "traefik.http.routers.todo-frontend-http.entrypoints=web"
-      - "traefik.http.routers.todo-frontend-http.middlewares=redirect-to-https"
-
-      # Middleware definition
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 networks:
   traefik-net:
