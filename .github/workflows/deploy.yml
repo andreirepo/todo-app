@@ -143,7 +143,10 @@ jobs:
              sudo chown ${{ env.SERVER_USER }}:${{ env.SERVER_USER }} /home/${{ env.SERVER_USER }}/apps/todo-app && \
              sudo chmod 755 /home/${{ env.SERVER_USER }}/apps/todo-app"
 
-          rsync -az --delete -e "ssh" --exclude='acme/' . \
+          # .env is excluded: rsync --delete would otherwise remove the
+          # server's credentials on every deploy, and the copy written from
+          # repo secrets does not necessarily match the database that exists.
+          rsync -az --delete -e "ssh" --exclude='acme/' --exclude='.env' . \
             ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/home/${{ env.SERVER_USER }}/apps/todo-app/
 
           # Pull first, write .env second, restart third. If the pull fails the
@@ -168,19 +171,24 @@ jobs:
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
           EOF
 
-          # Streamed from the runner rather than built on the server by a
-          # nested heredoc: no leading whitespace, and a secret containing a
-          # '$' cannot be expanded on the way through.
+          # .env is written once, on the first deploy, and never rewritten.
+          # Mongo's root user is created from those credentials when the data
+          # volume is initialised — regenerating the file on every deploy means
+          # any change to a repo secret silently locks the backend out of an
+          # existing database. Rotating a credential is now an edit on the
+          # server, which is the only place it can be rotated safely.
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'test -f /home/${{ env.SERVER_USER }}/apps/todo-app/.env' || \
           cat <<'EOF' | ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cat > /home/${{ env.SERVER_USER }}/apps/todo-app/.env'
           MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
           MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
           NODE_ENV=production
           UV_THREADPOOL_SIZE=4
           JWT_SECRET=${{ secrets.JWT_SECRET }}
-          IMAGE_TAG=${{ github.sha }}
           EOF
 
-          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cd /home/${{ env.SERVER_USER }}/apps/todo-app && docker compose -f docker-compose.yml up -d'
+          # The image tag is passed per deploy instead of living in .env, so a
+          # rollback does not have to edit the credentials file.
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cd /home/${{ env.SERVER_USER }}/apps/todo-app && IMAGE_TAG=${{ github.sha }} docker compose -f docker-compose.yml up -d'
 
   health-check:
     needs: deploy
@@ -265,8 +273,7 @@ jobs:
             fi
 
             echo "Rolling back from ${IMAGE_TAG:-unknown} to $PREVIOUS_TAG"
-            sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=$PREVIOUS_TAG|" .env
-            docker compose -f docker-compose.yml up -d
+            IMAGE_TAG=$PREVIOUS_TAG docker compose -f docker-compose.yml up -d
 
             # Clear the previous tag so a second rollback cannot replay it now
             # that it is the current one.
