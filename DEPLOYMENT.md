@@ -100,3 +100,66 @@ The project automatically uses the right environment:
 - Set up S3 bucket for static hosting
 - Configure CloudFront (optional)
 - Point Route 53 domain to S3/CloudFront
+
+---
+
+## 🔧 Manual deploy to the homelab (CI retired)
+
+CI was removed from this repository. It needed Node, Docker buildx and SSH to a
+host behind NAT — none of which belongs on a 3 GB k3s cluster — and the
+self-hosted runner it depended on carried a long-lived personal access token.
+Deploys are manual now, and the procedure below is what the workflow used to do.
+
+The server runs `~/apps/todo-app/docker-compose.yml`, which references two
+images by tag:
+
+```
+ghcr.io/andreirepo/todo-app/todo-backend:${IMAGE_TAG:-latest}
+ghcr.io/andreirepo/todo-app/todo-frontend:${IMAGE_TAG:-latest}
+```
+
+### 1. Build and push (from the Mac)
+
+```bash
+TAG=$(git rev-parse --short HEAD)
+docker login ghcr.io    # fine-grained token, packages: write
+
+docker buildx build --platform linux/amd64 --push \
+  -f ./app/server/Dockerfile \
+  -t ghcr.io/andreirepo/todo-app/todo-backend:$TAG \
+  -t ghcr.io/andreirepo/todo-app/todo-backend:latest .
+
+docker buildx build --platform linux/amd64 --push \
+  -f ./app/client/Dockerfile \
+  --build-arg API_URL=/apps/todo/api \
+  --build-arg BASE_URL=/apps/todo/ \
+  --build-arg NODE_ENV=production \
+  -t ghcr.io/andreirepo/todo-app/todo-frontend:$TAG \
+  -t ghcr.io/andreirepo/todo-app/todo-frontend:latest .
+```
+
+Both tags matter: the commit tag is what a rollback targets, `latest` keeps a
+plain `docker compose up` working for anyone without a state file.
+
+### 2. Deploy
+
+```bash
+ssh dev-server "cd ~/apps/todo-app && \
+  docker pull ghcr.io/andreirepo/todo-app/todo-backend:$TAG && \
+  docker pull ghcr.io/andreirepo/todo-app/todo-frontend:$TAG && \
+  IMAGE_TAG=$TAG docker compose up -d"
+```
+
+### 3. Roll back
+
+`~/apps/todo-app-deploy.state` on the server keeps `PREVIOUS_TAG=`. Deploy that
+tag with the command above.
+
+### Notes worth keeping
+
+- `~/apps/todo-app/.env` is written **once** and never regenerated. Mongo
+  creates its root user from those credentials when the data volume is
+  initialised, so changing them on an existing database locks the backend out.
+  Rotate credentials on the server, not in repository secrets.
+- The `.env` also holds `JWT_SECRET`; losing it invalidates every existing
+  session, which is usually fine and occasionally very confusing.
