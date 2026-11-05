@@ -96,5 +96,9 @@ Perfect for testing frameworks:
 
 ## Demo
 
-- App: https://todo.andreiqa.click/
+- App: https://andreirepo.com/apps/todo/
 - Credentials: `demo@todo.com` / `letmein123`
+
+The account is created in the deployed database, not seeded from code, so a
+fresh database volume has none. Recreate it with `./scripts/seed-demo-user.sh`
+after a rebuild.
